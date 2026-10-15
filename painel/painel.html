@@ -149,7 +149,8 @@ tbody tr.grp td .mini-n{color:var(--muted);margin-left:6px}
 .msg.err{background:var(--sus-bg);color:var(--sus)}
 .msg.ok{background:var(--ok-bg);color:var(--ok)}
 .msg.info{background:var(--pre-bg);color:var(--pre-ink)}
-#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;max-width:min(560px,calc(100vw - 32px));box-shadow:0 8px 22px rgba(28,37,67,.18);margin:0}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;max-width:min(560px,calc(100vw - 32px));box-shadow:0 8px 22px rgba(28,37,67,.18);margin:0;background:var(--card);border:1px solid var(--line);border-left:4px solid currentColor;font-weight:600}
+#toast.info{color:var(--pre-ink);border-left-color:var(--pre)}
 
 /* importar */
 .drop{border:2px dashed var(--line);border-radius:var(--r);background:var(--card);padding:34px 20px;text-align:center;display:grid;gap:8px;justify-items:center;transition:border-color .15s, background .15s}
@@ -327,6 +328,7 @@ const NOME_SIT = Object.fromEntries(C.SITUACOES.map(s => [s.id, s.nome]));
 const NOME_RES = { aprovado: 'Aprovado', reprovado: 'Reprovado', expirado: 'Expirado' };
 const PRESENCA_MIN = 3;
 const DEMO = new URLSearchParams(location.search).has('demo');
+const TOAST = document.getElementById('toast'); // referência fixa: a mensagem muda de lugar quando o detalhe está aberto
 
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
@@ -471,6 +473,21 @@ async function acao(fn, okMsg) {
   try { await fn(); if (okMsg) aviso(okMsg, 'ok'); }
   catch (e) { aviso('Não foi possível salvar na pasta: ' + e.message, 'err'); }
 }
+// Alteração num veículo aberto no detalhe: relê a pasta logo antes de gravar e, se um colega
+// mexeu no veículo depois que o detalhe foi aberto, não grava e mostra o que mudou.
+async function acaoVeiculo(placa, fn, okMsg) {
+  const visto = st.aberto && st.aberto.placa === placa ? st.aberto.visto : null;
+  await recarregar();
+  const v = st.estado.veiculos.find(x => x.placa === placa);
+  const novos = visto && v ? v.historico.filter(e => !visto.has(e.id)) : [];
+  if (novos.length) {
+    const e = novos[novos.length - 1];
+    if (st.aberto) { st.aberto.chave = null; renderDetalhe(); }
+    aviso(`${e.pessoa || 'Outra pessoa'} acabou de alterar ${placa}. Confira a situação atual e, se ainda for o caso, repita a ação.`, 'err');
+    return;
+  }
+  return acao(fn, okMsg);
+}
 
 /* ---------- presença ---------- */
 async function presenca() {
@@ -536,7 +553,11 @@ function render() {
   renderTopo();
   if (!st.pessoa || $('#tabs').hidden) return;
   renderFila(); renderPessoas();
-  if (st.aberto && $('#det').open) renderDetalhe();
+  if (st.aberto && $('#det').open) {
+    // só redesenha o detalhe se o veículo mudou, para não perder o que está sendo digitado
+    const v = st.estado.veiculos.find(x => x.placa === st.aberto.placa);
+    if (!v || chaveDetalhe(v) !== st.aberto.chave) renderDetalhe();
+  }
 }
 
 function renderTopo() {
@@ -637,13 +658,19 @@ $('#tbody').addEventListener('keydown', e => {
 });
 
 /* ---------- detalhe do veículo ---------- */
+const JANELA_RECENTE_MIN = 10;
+const chaveDetalhe = v => `${v.historico.length}|${v.situacao}|${v.ativo}|${Math.floor(Date.now() / 60000)}`;
+function haQuanto(iso) {
+  const min = Math.floor((Date.now() - new Date(iso)) / 60000);
+  return min < 1 ? 'há instantes' : `há ${min} min`;
+}
 function abrir(placa, validar) {
-  st.aberto = { placa, validar: !!validar, armado: false };
+  st.aberto = { placa, validar: !!validar, armado: false, rascunho: null };
   renderDetalhe();
   const d = $('#det'); if (!d.open) d.showModal();
   const alvo = validar ? $('#d-validar') : $('#d-fechar'); if (alvo) alvo.focus();
 }
-$('#det').addEventListener('close', () => { st.aberto = null; });
+$('#det').addEventListener('close', () => { st.aberto = null; if (TOAST.parentNode !== document.body) document.body.append(TOAST); });
 $('#det').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
 
 function descreverEvento(e) {
@@ -664,7 +691,14 @@ function renderDetalhe() {
   const v = st.estado.veiculos.find(x => x.placa === st.aberto.placa);
   const d = $('#det');
   if (!v) { d.close(); return; }
+  st.aberto.visto = new Set(v.historico.map(e => e.id));
+  st.aberto.chave = chaveDetalhe(v);
   const ck = v.atual || {};
+  const recentes = v.historico.filter(e => e.pc !== st.pc && Date.now() - new Date(e.ts) < JANELA_RECENTE_MIN * 60000);
+  const alerta = recentes.length ? (() => {
+    const e = recentes[recentes.length - 1];
+    return `<div class="msg info" role="alert" style="margin:0"><b>${esc(e.pessoa || 'Outra pessoa')} alterou este veículo ${haQuanto(e.ts)}:</b> ${descreverEvento(e)}${recentes.length > 1 ? ` <span class="muted">(+${recentes.length - 1} alteração(ões) recente(s) no histórico)</span>` : ''}. Confira antes de mudar algo.</div>`;
+  })() : '';
   const podeValidar = v.situacao === 'confirmar' && v.ativo;
   const manual = v.manual?.situacao;
   const conf = podeValidar ? `
@@ -682,6 +716,7 @@ function renderDetalhe() {
       </div>
     </div>` : '';
   const hist = [...v.historico].reverse().map(e => `<div class="tl"><span class="mo">${fmtDataHora(e.ts)}</span><span>${descreverEvento(e)}</span><span class="acc">${esc(e.pessoa || '')}</span></div>`).join('');
+  const tinhaToast = TOAST.parentNode === d;
   d.innerHTML = `<div class="det-in">
     <div class="hero">
       <button class="x" type="button" id="d-fechar" aria-label="Fechar">×</button>
@@ -693,6 +728,7 @@ function renderDetalhe() {
         <span class="pill${v.dias !== null && v.dias <= C.ANTECEDENCIA_DIAS ? ' warn' : ''}">Vencimento ${fmtData(v.vencimento)}${v.dias !== null ? ' · ' + relativo(v) : ''}</span>
       </div>
     </div>
+    ${alerta}
     ${conf}
     <div class="two">
       <div class="card pad">
@@ -719,7 +755,7 @@ function renderDetalhe() {
         </div>
         <div class="fld" style="margin-top:14px">
           <label for="d-obs">Observação</label>
-          <textarea id="d-obs" maxlength="500">${esc(v.observacao)}</textarea>
+          <textarea id="d-obs" maxlength="500">${esc(st.aberto.rascunho ?? v.observacao)}</textarea>
         </div>
         <div class="actions">
           <button class="btn ghost" type="button" id="d-obs-salvar">Salvar observação</button>
@@ -734,24 +770,27 @@ function renderDetalhe() {
     </div>
   </div>`;
 
+  if (tinhaToast) d.append(TOAST);
   $('#d-fechar', d).onclick = () => d.close();
   const pdf = () => abrirPdf(ck.arquivo);
   if ($('#d-pdf', d)) $('#d-pdf', d).onclick = pdf;
   if ($('#d-pdf2', d)) $('#d-pdf2', d).onclick = pdf;
-  if ($('#d-validar', d)) $('#d-validar', d).onclick = () => acao(() => gravar('validado', v.placa, { codigo: ck.codigo || null }), `${v.placa} validado e lançado.`);
+  if ($('#d-validar', d)) $('#d-validar', d).onclick = () => acaoVeiculo(v.placa, () => gravar('validado', v.placa, { codigo: ck.codigo || null }), `${v.placa} validado e lançado.`);
   d.querySelectorAll('[data-manual]').forEach(b => b.onclick = () => {
     const s = b.dataset.manual || null;
-    acao(() => gravar('situacao_definida', v.placa, { situacao: s }), s ? `${v.placa}: ${NOME_SIT[s]}.` : `${v.placa} voltou ao cálculo automático.`);
+    acaoVeiculo(v.placa, () => gravar('situacao_definida', v.placa, { situacao: s }), s ? `${v.placa}: ${NOME_SIT[s]}.` : `${v.placa} voltou ao cálculo automático.`);
   });
+  $('#d-obs', d).oninput = e => { st.aberto.rascunho = e.target.value; };
   $('#d-obs-salvar', d).onclick = () => {
     const t = $('#d-obs', d).value.trim();
     if (t === v.observacao) { aviso('A observação não mudou.', 'info'); return; }
-    acao(() => gravar('observacao', v.placa, { texto: t }), 'Observação salva.');
+    acaoVeiculo(v.placa, () => gravar('observacao', v.placa, { texto: t }), 'Observação salva.')
+      .then(() => { if (st.aberto && st.estado.veiculos.find(x => x.placa === v.placa)?.observacao === t) st.aberto.rascunho = null; });
   };
   $('#d-ativo', d).onclick = () => {
-    if (!v.ativo) { acao(() => gravar('reativado', v.placa), `${v.placa} reativado.`); return; }
+    if (!v.ativo) { acaoVeiculo(v.placa, () => gravar('reativado', v.placa), `${v.placa} reativado.`); return; }
     if (!st.aberto.armado) { st.aberto.armado = true; renderDetalhe(); $('#d-ativo').focus(); return; }
-    acao(() => gravar('desativado', v.placa), `${v.placa} desativado. Ele continua em "Desativados".`);
+    acaoVeiculo(v.placa, () => gravar('desativado', v.placa), `${v.placa} desativado. Ele continua em "Desativados".`);
   };
 }
 
@@ -831,7 +870,9 @@ $('#pes-form').addEventListener('submit', e => {
 function botao(txt, cls, fn) { const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.textContent = txt; b.onclick = fn; return b; }
 let toastT;
 function aviso(txt, tipo) {
-  const t = $('#toast'); t.className = 'msg ' + (tipo || 'info'); t.textContent = txt; t.hidden = false;
+  const t = TOAST; t.className = 'msg ' + (tipo || 'info'); t.textContent = txt; t.hidden = false;
+  const det = $('#det'), alvo = det.open ? det : document.body; // o detalhe fica acima de tudo; a mensagem vai junto
+  if (t.parentNode !== alvo) alvo.append(t);
   clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, tipo === 'err' ? 9000 : 4000);
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { recarregar(); presenca(); } });
