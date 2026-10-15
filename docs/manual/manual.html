@@ -119,68 +119,24 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
   <h2>O que tem neste manual</h2>
   <div class="faixa"></div>
   <ol>
-    <li><span>01</span><div>Preparar a pasta no Teams<small>Uma vez, por quem administra o painel</small></div></li>
-    <li><span>02</span><div>Sincronizar a pasta no seu computador<small>Cada pessoa, uma vez</small></div></li>
-    <li><span>03</span><div>Primeiro acesso ao painel<small>Escolher a pasta e o seu nome</small></div></li>
-    <li><span>04</span><div>Como a fila funciona<small>As cinco situações e o que muda cada uma</small></div></li>
-    <li><span>05</span><div>Importar checklists da Raster</div></li>
-    <li><span>06</span><div>Validar e lançar no Rodopar</div></li>
-    <li><span>07</span><div>Manutenção, cancelado, observação e desativação</div></li>
-    <li><span>08</span><div>Trabalhando em equipe</div></li>
-    <li><span>09</span><div>Problemas comuns</div></li>
+    <li><span>01</span><div>Sincronizar a pasta no seu computador<small>Uma vez, em cada computador</small></div></li>
+    <li><span>02</span><div>Primeiro acesso ao painel<small>Escolher a pasta e o seu nome</small></div></li>
+    <li><span>03</span><div>Como a fila funciona<small>As cinco situações e o que muda cada uma</small></div></li>
+    <li><span>04</span><div>Importar checklists da Raster</div></li>
+    <li><span>05</span><div>Validar e lançar no Rodopar</div></li>
+    <li><span>06</span><div>Manutenção, cancelado, observação e desativação</div></li>
+    <li><span>07</span><div>Trabalhando em equipe</div></li>
+    <li><span>08</span><div>Problemas comuns</div></li>
   </ol>
-  <div class="quem">
-    <div><h4>Vai usar o painel?</h4><p>Leia as seções 2 e 3 uma vez para instalar no seu computador. Depois, as seções 4 a 8 explicam o dia a dia.</p></div>
-    <div><h4>Vai administrar a pasta?</h4><p>Comece pela seção 1. Ela só precisa ser feita uma vez para toda a equipe.</p></div>
-  </div>
+  <div class="quem" style="grid-template-columns:1fr"><div><h4>Por onde começar</h4><p>Leia as seções 1 e 2 uma vez para deixar o painel funcionando no seu computador. As seções 3 a 7 explicam o dia a dia, e a seção 8 ajuda quando algo não funciona.</p></div></div>
   <div class="nota" style="margin-top:18px"><b>Sobre as imagens:</b> as marcadas como <b>print</b> são telas reais do painel, do Teams e do SharePoint. As marcadas como <b>ilustração</b> mostram telas do OneDrive, do Windows e do navegador de forma simplificada; a tela no seu computador pode ter outra aparência, mas os nomes dos botões são os mesmos.</div>
 </div>
 
-<!-- 1 -->
-<section>
-  <h2><span class="n">01</span>Preparar a pasta no Teams</h2><div class="faixa"></div>
-  <p class="lead">Feito uma vez, por quem administra o painel. Quem só vai usar pula para a seção 2. A pasta fica num time do Teams, e não no OneDrive de uma pessoa: o acesso não depende de ninguém em particular e os dados não somem se uma conta for desativada.</p>
-  <ol class="passos">
-    <li><div>No Teams, abra <b>Equipes</b> › <b>+</b> › <b>Criar equipe</b> › <b>Do zero</b>. Tipo <b>Privado</b>, nome <code>Checklist Rastreador - Raster</code>. O primeiro canal pode ter o mesmo nome.</div></li>
-  </ol>
-  <figure class="estreita">
-    <div class="moldura"><img src="img/teams-criar-equipe.png" alt="Tela Criar uma equipe no Teams" style="width:210px"></div>
-    <figcaption><span class="tag print">Print</span>Criação da equipe no Teams.</figcaption>
-  </figure>
-  <ol class="passos" style="counter-reset:p 1">
-    <li><div>Adicione quem usa o painel: <b>⋯</b> ao lado do nome da equipe › <b>Adicionar membro</b>. Membros podem editar os arquivos, que é o que o painel precisa.</div></li>
-    <li><div>Quem também deve poder convidar e remover pessoas vira <b>Proprietário</b>, em <b>⋯ › Gerenciar equipe › Membros</b>. Assim ninguém depende de uma pessoa só para dar acesso.</div></li>
-    <li><div>No canal, abra a aba <b>Compartilhado</b> › <b>Abrir no SharePoint</b> e crie a pasta <code>Checklist Rastreador</code> em <b>+ Criar ou carregar</b> › <b>Pasta</b>.</div></li>
-  </ol>
-  <figure>
-    <div class="moldura" style="background:#fff"><img src="img/teams-aba-compartilhado.png" alt="Aba Compartilhado da equipe no Teams"></div>
-    <figcaption><span class="tag print">Print</span>A aba <b>Compartilhado</b> é onde ficam os arquivos do canal. No Teams antigo, ela se chama <b>Arquivos</b>.</figcaption>
-  </figure>
-  <ol class="passos" style="counter-reset:p 4">
-    <li><div>Sincronize essa pasta no seu computador (seção 2).</div></li>
-    <li><div>No Explorador de Arquivos, extraia dentro da pasta sincronizada o <code>checklist-rastreador.zip</code> e, só na primeira instalação, o <code>planilha-inicial.zip</code>, que traz os 87 veículos da planilha antiga. Extraia pelo Explorador: carregar o zip pelo navegador não extrai o conteúdo.</div></li>
-  </ol>
-  <p>No SharePoint, a pasta fica em <b>Documentos › Checklist Rastreador - Raster › Checklist Rastreador</b>. Se ela já existia no OneDrive de alguém, mova em vez de criar outra: no OneDrive pela web, selecione a pasta › <b>Mover para</b> › o site <b>Checklist Rastreador - Raster</b> › <b>Documentos</b> › o canal › <b>Mover aqui</b>. Depois cada pessoa sincroniza a pasta nova e usa <b>trocar pasta</b> no painel.</p>
-  <h3>Como a pasta fica depois de extrair</h3>
-  <table>
-    <thead><tr><th>Item</th><th>O que é</th><th>Quem mexe</th></tr></thead>
-    <tbody>
-      <tr><td><code>painel.html</code></td><td>O painel</td><td>Ninguém. É só abrir</td></tr>
-      <tr><td><code>lib/</code></td><td>Arquivos que o painel usa para ler os PDFs</td><td>Ninguém</td></tr>
-      <tr><td><code>LEIA-ME.md</code></td><td>Resumo da instalação</td><td>Ninguém</td></tr>
-      <tr><td><code>eventos/</code></td><td>Uma alteração por arquivo: são os dados e o histórico da fila</td><td>Só o painel</td></tr>
-      <tr><td><code>presenca/</code></td><td>Quem está com o painel aberto (criada no primeiro uso)</td><td>Só o painel</td></tr>
-      <tr><td><code>checklists/</code></td><td>Cópia dos PDFs importados, por placa (criada no primeiro uso)</td><td>Só o painel</td></tr>
-    </tbody>
-  </table>
-  <div class="alerta"><b>Nunca apague, renomeie ou edite arquivos em <code>eventos/</code>.</b> Cada arquivo é uma alteração feita por alguém; apagar um deles desfaz essa alteração para todos.</div>
-  <p>Para instalar uma versão nova do painel, extraia o zip novo por cima e aceite substituir <code>painel.html</code> e <code>lib/</code>. As pastas de dados continuam como estão.</p>
-</section>
-
 <!-- 2 -->
 <section>
-  <h2><span class="n">02</span>Sincronizar a pasta no seu computador</h2><div class="faixa"></div>
+  <h2><span class="n">01</span>Sincronizar a pasta no seu computador</h2><div class="faixa"></div>
   <p class="lead">Cada pessoa faz isso uma vez. A sincronização faz a pasta do SharePoint aparecer no Explorador de Arquivos e manda suas alterações para os colegas automaticamente.</p>
+  <div class="nota">A pasta fica no time do Teams <b>Checklist Rastreador - Raster</b>. Se você ainda não é membro do time, peça a um proprietário para adicionar você antes de começar.</div>
 
   <h3>Passo 1 · Confira se o OneDrive está conectado</h3>
   <p>Olhe os ícones perto do relógio do Windows. Se não houver nenhuma nuvem, ou se ela estiver cinza, abra o <b>OneDrive</b> pelo menu Iniciar e entre com seu e-mail da empresa.</p>
@@ -249,12 +205,13 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
   <h3>Passo 4 · Crie o atalho do painel</h3>
   <p>Clique com o botão direito em <code>painel.html</code> e escolha <b>Enviar para › Área de trabalho (criar atalho)</b>. No Windows 11, essa opção fica em <b>Mostrar mais opções</b>. Nos próximos dias, é só abrir o painel pelo atalho.</p>
-  <div class="nota">Se a nuvem do OneDrive mostrar um X vermelho ou um aviso, suas alterações ficam só no seu computador até a sincronização voltar. Veja a seção 9.</div>
+  <div class="nota">Se a nuvem do OneDrive mostrar um X vermelho ou um aviso, suas alterações ficam só no seu computador até a sincronização voltar. Veja a seção 8.</div>
+  <div class="alerta"><b>Nunca apague, renomeie ou edite arquivos dentro de <code>eventos/</code>, <code>presenca/</code> e <code>checklists/</code>.</b> Quem cuida delas é o painel: cada arquivo em <code>eventos/</code> é uma alteração feita por alguém, e apagar um deles desfaz essa alteração para todos.</div>
 </section>
 
 <!-- 3 -->
 <section>
-  <h2><span class="n">03</span>Primeiro acesso ao painel</h2><div class="faixa"></div>
+  <h2><span class="n">02</span>Primeiro acesso ao painel</h2><div class="faixa"></div>
   <p class="lead">O painel funciona no <b>Microsoft Edge</b> ou no <b>Google Chrome</b>. Firefox e Safari não conseguem gravar na pasta.</p>
   <ol class="passos">
     <li><div>Abra o <code>painel.html</code> pelo atalho ou pela pasta sincronizada. Se abrir em outro navegador, clique com o botão direito no arquivo, escolha <b>Abrir com</b> e selecione Edge ou Chrome.</div></li>
@@ -292,7 +249,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 4 -->
 <section>
-  <h2><span class="n">04</span>Como a fila funciona</h2><div class="faixa"></div>
+  <h2><span class="n">03</span>Como a fila funciona</h2><div class="faixa"></div>
   <p class="lead">Cada veículo fica numa de cinco situações, mostradas nesta ordem de cima para baixo. Dentro de cada situação, o vencimento mais próximo vem primeiro.</p>
   <figure>
     <div class="moldura"><img src="img/03-fila.png" alt="Fila de veículos com os contadores por situação"></div>
@@ -303,7 +260,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
     <thead><tr><th style="width:30%">Situação</th><th>O veículo está aqui quando</th><th style="width:30%">O que fazer</th></tr></thead>
     <tbody>
       <tr><td><span class="st nec">Necessário realizar checklist</span></td><td>Faltam 15 dias ou menos para vencer, já venceu (etiqueta <b>Vencido</b>) ou o último PDF foi reprovado</td><td>Fazer o checklist na Raster e importar o PDF</td></tr>
-      <tr><td><span class="st con">Checklist feito – confirmar validação</span></td><td>Chegou um PDF aprovado que ninguém conferiu</td><td>Validar e lançar (seção 6)</td></tr>
+      <tr><td><span class="st con">Checklist feito – confirmar validação</span></td><td>Chegou um PDF aprovado que ninguém conferiu</td><td>Validar e lançar (seção 5)</td></tr>
       <tr><td><span class="st man">Manutenção</span></td><td>Uma pessoa marcou</td><td>Voltar ao cálculo automático quando o veículo sair da oficina</td></tr>
       <tr><td><span class="st can">Checklist cancelado</span></td><td>Uma pessoa marcou</td><td>Voltar ao cálculo automático quando fizer sentido</td></tr>
       <tr><td><span class="st val">Validado e lançado</span></td><td>O checklist foi conferido e faltam mais de 15 dias para vencer</td><td>Nada. Ele volta sozinho para o topo a 15 dias do vencimento</td></tr>
@@ -340,7 +297,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 5 -->
 <section>
-  <h2><span class="n">05</span>Importar checklists da Raster</h2><div class="faixa"></div>
+  <h2><span class="n">04</span>Importar checklists da Raster</h2><div class="faixa"></div>
   <p class="lead">Importar o PDF é o que coloca um checklist novo na fila. Não há nada para digitar.</p>
   <ol class="passos">
     <li><div>No portal da Raster, abra <b>Geração Aprovação/Reprovação do CheckList</b> e baixe o PDF do checklist.</div></li>
@@ -354,7 +311,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
   <table>
     <thead><tr><th style="width:30%">Aparece</th><th>O que aconteceu</th></tr></thead>
     <tbody>
-      <tr><td><span class="st val">Importado</span> · Aprovado</td><td>O veículo vai para "Checklist feito – confirmar validação". Falta validar (seção 6)</td></tr>
+      <tr><td><span class="st val">Importado</span> · Aprovado</td><td>O veículo vai para "Checklist feito – confirmar validação". Falta validar (seção 5)</td></tr>
       <tr><td><span class="st val">Importado</span> · Reprovado</td><td>O veículo vai para "Necessário realizar checklist"</td></tr>
       <tr><td><span class="st man">Já importado</span></td><td>Esse checklist já estava na fila. O aviso diz quem importou e quando. Nada muda</td></tr>
       <tr><td><span class="st nec">Erro</span></td><td>O arquivo não é um checklist da Raster ou está incompleto. Baixe o PDF de novo</td></tr>
@@ -366,7 +323,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 6 -->
 <section>
-  <h2><span class="n">06</span>Validar e lançar no Rodopar</h2><div class="faixa"></div>
+  <h2><span class="n">05</span>Validar e lançar no Rodopar</h2><div class="faixa"></div>
   <p class="lead">Validar é a conferência humana de um checklist aprovado. É o que leva o veículo para o fim da fila, em "Validado e lançado".</p>
   <ol class="passos">
     <li><div>Lance a informação no Rodopar, como hoje.</div></li>
@@ -383,8 +340,8 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 7 -->
 <section>
-  <h2><span class="n">07</span>Manutenção, cancelado, observação e desativação</h2><div class="faixa"></div>
-  <p class="lead">Tudo isso fica no detalhe do veículo: clique em qualquer linha da fila para abrir. Os botões ficam no quadro <b>Situação manual</b>, à direita (veja o print da seção 6).</p>
+  <h2><span class="n">06</span>Manutenção, cancelado, observação e desativação</h2><div class="faixa"></div>
+  <p class="lead">Tudo isso fica no detalhe do veículo: clique em qualquer linha da fila para abrir. Os botões ficam no quadro <b>Situação manual</b>, à direita (veja o print da seção 5).</p>
   <table>
     <thead><tr><th style="width:26%">Para</th><th style="width:36%">Faça</th><th>O que acontece</th></tr></thead>
     <tbody>
@@ -401,7 +358,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 8 -->
 <section>
-  <h2><span class="n">08</span>Trabalhando em equipe</h2><div class="faixa"></div>
+  <h2><span class="n">07</span>Trabalhando em equipe</h2><div class="faixa"></div>
   <p class="lead">Várias pessoas podem usar o painel ao mesmo tempo. Cada alteração é salva na hora, num arquivo próprio, então ninguém apaga o trabalho do outro. Não existe botão Salvar.</p>
   <div class="duas">
     <div>
@@ -414,7 +371,7 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
       <figcaption><span class="tag print">Print</span>Pasta lida às 14:51; Ana Paula e Jader Moreira no painel.</figcaption>
     </figure>
   </div>
-  <p><b>Dar acesso a alguém novo:</b> um proprietário do time adiciona a pessoa como membro no Teams (<b>⋯ › Adicionar membro</b>). Depois a pessoa segue as seções 2 e 3 no computador dela.</p>
+  <p><b>Alguém novo precisa usar o painel:</b> peça a um proprietário do time no Teams para adicionar a pessoa como membro. Depois ela segue as seções 1 e 2 no computador dela.</p>
   <p>A aba <b>Pessoas</b> mostra quem usa o painel. Dá para adicionar e remover nomes; a remoção pede um segundo clique para confirmar.</p>
   <h3>Quando um colega mexe no mesmo veículo</h3>
   <ul>
@@ -430,17 +387,16 @@ figure.det2 .moldura,figure.det2 figcaption{width:60%}
 
 <!-- 9 -->
 <section>
-  <h2><span class="n">09</span>Problemas comuns</h2><div class="faixa"></div>
+  <h2><span class="n">08</span>Problemas comuns</h2><div class="faixa"></div>
   <table>
     <thead><tr><th style="width:38%">Problema</th><th>Como resolver</th></tr></thead>
     <tbody>
       <tr><td>Aparece "Abra este painel no Microsoft Edge ou no Google Chrome"</td><td>O arquivo abriu em outro navegador. Botão direito em <code>painel.html</code> › <b>Abrir com</b> › Edge ou Chrome</td></tr>
       <tr><td>Aparece "Reconectar à pasta"</td><td>Clique em <b>Permitir acesso à pasta</b>. É o navegador pedindo confirmação; nada se perdeu</td></tr>
       <tr><td>A fila abriu vazia, mas os colegas veem veículos</td><td>O painel está apontando para outra pasta. Clique em <b>trocar pasta</b> e selecione a pasta sincronizada do time</td></tr>
-      <tr><td>Aparece "Falha ao ler a pasta" no canto de cima</td><td>A pasta mudou de lugar ou deixou de ser sincronizada. Sincronize a pasta do time de novo (seção 2) e use <b>trocar pasta</b></td></tr>
+      <tr><td>Aparece "Falha ao ler a pasta" no canto de cima</td><td>A pasta mudou de lugar ou deixou de ser sincronizada. Sincronize a pasta do time de novo (seção 1) e use <b>trocar pasta</b></td></tr>
       <tr><td>A alteração de um colega não aparece</td><td>Confira se a nuvem do OneDrive está azul, sem aviso, no seu computador e no dele. Espere um ou dois minutos</td></tr>
       <tr><td>Aparece "Não foi possível salvar na pasta"</td><td>Você não é membro do time, ou o OneDrive está pausado. Peça a um proprietário do time para adicionar você</td></tr>
-      <tr><td>Não consigo adicionar uma pessoa ao time</td><td>Só proprietários adicionam membros. Peça a um proprietário, ou peça para ser proprietário</td></tr>
       <tr><td>"Abrir PDF" diz que não encontrou o arquivo</td><td>O PDF ainda está sincronizando. Tente de novo em instantes</td></tr>
       <tr><td>Apareceu um arquivo com nome de computador, como <code>2210098-PC01.pdf</code></td><td>Duas pessoas importaram o mesmo PDF ao mesmo tempo e o OneDrive criou uma cópia. Pode apagar a cópia; o checklist conta uma vez só</td></tr>
       <tr><td>Escolhi o nome errado</td><td>Troque na caixa <b>Você</b>, no canto de cima. O que já foi feito continua com o nome anterior</td></tr>
