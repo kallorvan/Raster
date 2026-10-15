@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de uso · Checklist do Rastreador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Manual impresso (A4) com a identidade do painel "Checklist do Rastreador". */
+:root{
+  --ink:#1C2543; --ink2:#363E58; --ink3:#5C6486;
+  --coral:#DD4663; --mauve:#AE82B1; --sand:#F4D38D;
+  --paper:#EFF0F5; --card:#FFFFFF; --line:#DCDEE8; --muted:#767B8D;
+  --ok:#1E8E5A; --ok-bg:rgba(30,142,90,.12);
+  --pre:#C99A2E; --pre-bg:#FBF1D9; --pre-ink:#6B4E0E;
+  --sus:#C22C4C; --sus-bg:#F9E1E6;
+  --neu:#5C6486; --mv:#7E4E86;
+  --f-ui:'Archivo',system-ui,'Segoe UI',sans-serif;
+  --f-num:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@page{size:A4;margin:16mm 15mm 18mm}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--f-ui);color:var(--ink);font-size:10.5pt;line-height:1.5;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.num,code{font-family:var(--f-num);font-size:.92em}
+code{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+p{margin:0 0 8px}
+b,strong{font-weight:700}
+
+/* capa */
+.capa{height:263mm;display:flex;flex-direction:column;break-after:page}
+.capa .marcas{display:flex;align-items:center;gap:18px}
+.capa .marcas img{height:46px}
+.capa .marcas .sep{width:1px;height:36px;background:var(--line)}
+.capa .meio{flex:1;display:flex;flex-direction:column;justify-content:center}
+.eyebrow{font-size:9pt;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 8px}
+.capa h1{font-size:40pt;line-height:1.02;margin:0;font-weight:800;letter-spacing:-.02em;font-variation-settings:'wdth' 112}
+.faixa{height:6px;width:180px;margin:22px 0;background:linear-gradient(90deg,var(--coral) 0 34%,var(--mauve) 34% 67%,var(--sand) 67% 100%);border-radius:3px}
+.capa .sub{font-size:13pt;color:var(--ink2);max-width:120mm;line-height:1.45}
+.capa .rodape{display:flex;justify-content:space-between;font-size:9pt;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+
+/* sumário */
+.sumario{break-after:page}
+.sumario ol{list-style:none;margin:14px 0 0;padding:0;counter-reset:s}
+.sumario li{display:grid;grid-template-columns:34px 1fr;gap:6px;padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5pt}
+.sumario li span{font-family:var(--f-num);color:var(--coral);font-weight:600}
+.sumario li small{display:block;color:var(--muted);font-size:9.5pt}
+.quem{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.quem div{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.quem h4{margin:0 0 4px;font-size:10pt}
+.quem p{margin:0;font-size:9.5pt;color:var(--ink2)}
+
+/* seções */
+section{break-before:page}
+section.cont{break-before:auto;margin-top:16px}
+h2{font-size:19pt;line-height:1.15;margin:0 0 4px;font-weight:800;letter-spacing:-.01em;font-variation-settings:'wdth' 110;display:flex;gap:12px;align-items:baseline}
+h2 .n{font-family:var(--f-num);font-size:13pt;color:var(--coral);font-weight:600}
+h2 + .faixa{margin:8px 0 14px;width:90px;height:4px}
+h3{font-size:11.5pt;margin:16px 0 6px;font-weight:700;break-after:avoid}
+h3.nova{break-before:page;margin-top:0}
+.lead{font-size:11.5pt;color:var(--ink2);margin-bottom:12px}
+
+/* passos */
+.passos{list-style:none;margin:0;padding:0;counter-reset:p}
+.passos > li{counter-increment:p;display:grid;grid-template-columns:28px 1fr;gap:10px;margin:0 0 10px;break-inside:avoid}
+.passos > li::before{content:counter(p);width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font:600 9.5pt var(--f-num);display:grid;place-items:center;margin-top:1px}
+.passos > li ul{margin:4px 0 0;padding-left:18px}
+
+/* figuras */
+figure{margin:10px 0 14px;break-inside:avoid}
+figure .moldura{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
+figure img{display:block;width:100%;height:auto}
+figure.estreita img{width:auto;max-width:100%;margin:0 auto}
+figure.estreita .moldura{display:flex;justify-content:center;padding:8px;background:#fff}
+figcaption{font-size:8.8pt;color:var(--muted);margin-top:5px;display:flex;gap:8px;align-items:baseline}
+figcaption .tag{font-size:7.5pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:1px 7px;white-space:nowrap}
+.tag.print{background:var(--ok-bg);color:var(--ok)}
+.tag.ilus{background:var(--pre-bg);color:var(--pre-ink)}
+svg{display:block;width:100%;height:auto}
+
+/* avisos e tabelas */
+.nota{border-left:4px solid var(--pre);background:var(--pre-bg);color:var(--pre-ink);border-radius:6px;padding:9px 12px;margin:10px 0;font-size:10pt;break-inside:avoid}
+.alerta{border-left:4px solid var(--sus);background:var(--sus-bg);color:#7a1a30;border-radius:6px;padding:9px 12px;margin:10px 0;font-size:10pt;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:8px 0 12px;break-inside:auto}
+thead th{background:var(--ink);color:#fff;font-weight:600;font-size:8pt;letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:7px 9px}
+tbody td{padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr{break-inside:avoid}
+.st{display:inline-block;font-size:8.5pt;font-weight:700;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.st.nec{background:var(--sus-bg);color:var(--sus)} .st.con{background:var(--pre-bg);color:var(--pre-ink)}
+.st.man{background:#E5E7EF;color:var(--neu)} .st.can{background:#F0E6F1;color:var(--mv)} .st.val{background:var(--ok-bg);color:var(--ok)}
+.btnx{display:inline-block;font-size:9pt;font-weight:700;border-radius:6px;padding:0 7px;border:1px solid var(--ink);background:var(--ink);color:#fff;white-space:nowrap}
+.btnx.g{background:var(--ok);border-color:var(--ok)}
+.btnx.l{background:#fff;color:var(--ink);border-color:var(--line)}
+figure.det .moldura{width:78%;margin:0 auto}
+figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="capa">
+  <div class="marcas"><img src="img/logo-dinamo.png" alt="Grupo Dínamo"><span class="sep"></span><img src="img/logo-toliman.png" alt="Tóliman Transportes"></div>
+  <div class="meio">
+    <p class="eyebrow">Gerenciamento de risco · Raster</p>
+    <h1>Checklist do Rastreador</h1>
+    <div class="faixa"></div>
+    <p class="sub">Manual de uso do painel que substitui a planilha "CHECK LIST RASTREADOR RASTER": como sincronizar a pasta no seu computador, importar os checklists e manter a fila em dia.</p>
+  </div>
+  <div class="rodape"><span>Manual de uso · versão 1</span><span>Outubro de 2026</span></div>
+</div>
+
+<!-- SUMÁRIO -->
+<div class="sumario">
+  <p class="eyebrow">Conteúdo</p>
+  <h2>O que tem neste manual</h2>
+  <div class="faixa"></div>
+  <ol>
+    <li><span>01</span><div>Preparar a pasta no SharePoint<small>Uma vez, por quem administra o painel</small></div></li>
+    <li><span>02</span><div>Sincronizar a pasta no seu computador<small>Cada pessoa, uma vez</small></div></li>
+    <li><span>03</span><div>Primeiro acesso ao painel<small>Escolher a pasta e o seu nome</small></div></li>
+    <li><span>04</span><div>Como a fila funciona<small>As cinco situações e o que muda cada uma</small></div></li>
+    <li><span>05</span><div>Importar checklists da Raster</div></li>
+    <li><span>06</span><div>Validar e lançar no Rodopar</div></li>
+    <li><span>07</span><div>Manutenção, cancelado, observação e desativação</div></li>
+    <li><span>08</span><div>Trabalhando em equipe</div></li>
+    <li><span>09</span><div>Problemas comuns</div></li>
+  </ol>
+  <div class="quem">
+    <div><h4>Vai usar o painel?</h4><p>Leia as seções 2 e 3 uma vez para instalar no seu computador. Depois, as seções 4 a 8 explicam o dia a dia.</p></div>
+    <div><h4>Vai administrar a pasta?</h4><p>Comece pela seção 1. Ela só precisa ser feita uma vez para toda a equipe.</p></div>
+  </div>
+  <div class="nota" style="margin-top:18px"><b>Sobre as imagens:</b> as marcadas como <b>print</b> são do próprio painel. As marcadas como <b>ilustração</b> mostram telas do SharePoint, do OneDrive e do Windows de forma simplificada; a tela no seu computador pode ter outra aparência, mas os nomes dos botões são os mesmos.</div>
+</div>
+
+<!-- 1 -->
+<section>
+  <h2><span class="n">01</span>Preparar a pasta no SharePoint</h2><div class="faixa"></div>
+  <p class="lead">Feito uma vez, por quem administra o painel. Quem só vai usar pula para a seção 2.</p>
+  <ol class="passos">
+    <li><div>No SharePoint, crie uma pasta para a fila, por exemplo <code>Checklist Rastreador</code>.</div></li>
+    <li><div>Dê permissão de <b>edição</b> a todos que vão usar o painel. Quem só tiver leitura vê a fila, mas o painel não consegue gravar o que essa pessoa fizer.</div></li>
+    <li><div>Extraia o <code>checklist-rastreador.zip</code> direto dentro da pasta, sem criar uma subpasta a mais.</div></li>
+    <li><div>Extraia o <code>planilha-inicial.zip</code> na mesma pasta. Ele traz os 87 veículos da planilha antiga.</div></li>
+  </ol>
+  <h3>Como a pasta fica depois de extrair</h3>
+  <table>
+    <thead><tr><th>Item</th><th>O que é</th><th>Quem mexe</th></tr></thead>
+    <tbody>
+      <tr><td><code>painel.html</code></td><td>O painel</td><td>Ninguém. É só abrir</td></tr>
+      <tr><td><code>lib/</code></td><td>Arquivos que o painel usa para ler os PDFs</td><td>Ninguém</td></tr>
+      <tr><td><code>LEIA-ME.md</code></td><td>Resumo da instalação</td><td>Ninguém</td></tr>
+      <tr><td><code>eventos/</code></td><td>Uma alteração por arquivo: são os dados e o histórico da fila</td><td>Só o painel</td></tr>
+      <tr><td><code>presenca/</code></td><td>Quem está com o painel aberto (criada no primeiro uso)</td><td>Só o painel</td></tr>
+      <tr><td><code>checklists/</code></td><td>Cópia dos PDFs importados, por placa (criada no primeiro uso)</td><td>Só o painel</td></tr>
+    </tbody>
+  </table>
+  <div class="alerta"><b>Nunca apague, renomeie ou edite arquivos em <code>eventos/</code>.</b> Cada arquivo é uma alteração feita por alguém; apagar um deles desfaz essa alteração para todos.</div>
+  <p>Para instalar uma versão nova do painel, extraia o zip novo por cima e aceite substituir <code>painel.html</code> e <code>lib/</code>. As pastas de dados continuam como estão.</p>
+</section>
+
+<!-- 2 -->
+<section>
+  <h2><span class="n">02</span>Sincronizar a pasta no seu computador</h2><div class="faixa"></div>
+  <p class="lead">Cada pessoa faz isso uma vez. A sincronização faz a pasta do SharePoint aparecer no Explorador de Arquivos e manda suas alterações para os colegas automaticamente.</p>
+
+  <h3>Passo 1 · Confira se o OneDrive está conectado</h3>
+  <p>Olhe os ícones perto do relógio do Windows. Se não houver nenhuma nuvem, ou se ela estiver cinza, abra o <b>OneDrive</b> pelo menu Iniciar e entre com seu e-mail da empresa.</p>
+  <figure>
+    <div class="moldura" style="background:#fff;padding:6px 10px">
+      <svg viewBox="0 0 700 120" role="img" aria-label="Ícone do OneDrive na barra de tarefas">
+        <defs><path id="nuvem" d="M14 30a10 10 0 0 1 2-19.8A13 13 0 0 1 40 8a11 11 0 0 1 12 11 9 9 0 0 1-2 11z"/></defs>
+        <rect x="0" y="0" width="700" height="120" fill="#fff"/>
+        <g transform="translate(40,26)"><rect width="190" height="48" rx="8" fill="#F3F4F8" stroke="#DCDEE8"/><use href="#nuvem" transform="translate(18,6)" fill="#1C6FD1"/><text x="88" y="30" font-family="Archivo,sans-serif" font-size="13" fill="#1C2543">10:42</text></g>
+        <text x="40" y="100" font-family="Archivo,sans-serif" font-size="12.5" font-weight="700" fill="#1E8E5A">Nuvem azul: sincronizando</text>
+        <g transform="translate(270,26)"><rect width="190" height="48" rx="8" fill="#F3F4F8" stroke="#DCDEE8"/><use href="#nuvem" transform="translate(18,6)" fill="none" stroke="#8A8FA0" stroke-width="2"/><text x="88" y="30" font-family="Archivo,sans-serif" font-size="13" fill="#1C2543">10:42</text></g>
+        <text x="270" y="100" font-family="Archivo,sans-serif" font-size="12.5" font-weight="700" fill="#6B4E0E">Nuvem cinza: entre na conta</text>
+        <g transform="translate(500,26)"><rect width="190" height="48" rx="8" fill="#F3F4F8" stroke="#DCDEE8"/><use href="#nuvem" transform="translate(18,6)" fill="#1C6FD1"/><circle cx="66" cy="38" r="9" fill="#C22C4C"/><path d="M62 34l8 8M70 34l-8 8" stroke="#fff" stroke-width="2"/><text x="94" y="30" font-family="Archivo,sans-serif" font-size="13" fill="#1C2543">10:42</text></g>
+        <text x="500" y="100" font-family="Archivo,sans-serif" font-size="12.5" font-weight="700" fill="#C22C4C">X vermelho: não sincroniza</text>
+      </svg>
+    </div>
+    <figcaption><span class="tag ilus">Ilustração</span>Barra de tarefas do Windows, perto do relógio.</figcaption>
+  </figure>
+
+  <h3>Passo 2 · Adicione a pasta ao seu OneDrive</h3>
+  <ol class="passos">
+    <li><div>No navegador, abra a pasta <code>Checklist Rastreador</code> no SharePoint (o link é enviado por quem administra).</div></li>
+    <li><div>Na barra de cima da pasta, clique em <b>Adicionar atalho ao Meu OneDrive</b>. Se essa opção não aparecer, clique em <b>Sincronizar</b> e aceite abrir o OneDrive quando o navegador perguntar.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura" style="background:#fff">
+      <svg viewBox="0 0 700 170" role="img" aria-label="Barra de comandos da pasta no SharePoint">
+        <rect x="0" y="0" width="700" height="170" fill="#fff"/>
+        <rect x="0" y="0" width="700" height="34" fill="#F3F4F8"/><circle cx="18" cy="17" r="5" fill="#DCDEE8"/><circle cx="34" cy="17" r="5" fill="#DCDEE8"/><circle cx="50" cy="17" r="5" fill="#DCDEE8"/>
+        <rect x="76" y="8" width="420" height="18" rx="9" fill="#fff" stroke="#DCDEE8"/><text x="90" y="21" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#767B8D">sharepoint.com/sites/.../Checklist Rastreador</text>
+        <text x="20" y="66" font-family="Archivo,sans-serif" font-size="15" font-weight="700" fill="#1C2543">Documentos › Checklist Rastreador</text>
+        <g font-family="Archivo,sans-serif" font-size="12.5" fill="#363E58">
+          <text x="20" y="102">+ Novo</text><text x="86" y="102">↑ Carregar</text><text x="172" y="102">Compartilhar</text>
+          <rect x="266" y="84" width="104" height="28" rx="6" fill="#FBF1D9" stroke="#C99A2E" stroke-width="1.5"/><text x="280" y="102" font-weight="700" fill="#1C2543">⟳ Sincronizar</text>
+          <rect x="380" y="84" width="248" height="28" rx="6" fill="#E3F2EA" stroke="#1E8E5A" stroke-width="2"/><text x="394" y="102" font-weight="700" fill="#1C2543">⊕ Adicionar atalho ao Meu OneDrive</text>
+          <text x="642" y="102">…</text>
+        </g>
+        <line x1="20" y1="124" x2="680" y2="124" stroke="#DCDEE8"/>
+        <g font-family="Archivo,sans-serif" font-size="12" fill="#363E58"><text x="20" y="148">📄 painel.html</text><text x="170" y="148">📁 lib</text><text x="250" y="148">📁 eventos</text><text x="350" y="148">📁 checklists</text></g>
+        <text x="494" y="150" font-family="Archivo,sans-serif" font-size="11" font-weight="700" fill="#1E8E5A">← prefira este</text>
+      </svg>
+    </div>
+    <figcaption><span class="tag ilus">Ilustração</span>Barra de comandos da pasta no SharePoint. Em telas estreitas, os botões podem estar dentro do menu "…".</figcaption>
+  </figure>
+
+  <h3>Passo 3 · Encontre a pasta no Explorador de Arquivos</h3>
+  <ol class="passos" style="counter-reset:p 2">
+    <li><div>Abra o <b>Explorador de Arquivos</b> (tecla Windows + E). A pasta aparece:
+      <ul><li>com <b>Adicionar atalho</b>: dentro de <b>OneDrive - [nome da empresa]</b>;</li><li>com <b>Sincronizar</b>: num item com o nome da empresa na barra lateral.</li></ul></div></li>
+    <li><div>Clique com o botão direito na pasta <code>Checklist Rastreador</code> e escolha <b>Sempre manter neste dispositivo</b>. Assim os arquivos ficam no computador e o painel não espera downloads.</div></li>
+    <li><div>Espere os ícones dos arquivos mostrarem o <b>tique verde</b>. Na primeira vez, pode levar alguns minutos.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura" style="background:#fff">
+      <svg viewBox="0 0 700 230" role="img" aria-label="Explorador de Arquivos com o menu Sempre manter neste dispositivo">
+        <rect x="0" y="0" width="700" height="230" fill="#fff"/>
+        <rect x="0" y="0" width="200" height="230" fill="#F3F4F8"/>
+        <g font-family="Archivo,sans-serif" font-size="12.5" fill="#363E58">
+          <text x="16" y="30">🏠 Início</text>
+          <text x="16" y="58" font-weight="700" fill="#1C2543">☁ OneDrive - Empresa</text>
+          <rect x="24" y="68" width="170" height="24" rx="5" fill="#E3F2EA" stroke="#1E8E5A"/><text x="34" y="85" font-weight="700" fill="#1C2543">📁 Checklist Rastreador</text>
+          <text x="34" y="112">📁 Documentos</text>
+          <text x="16" y="146">🖥 Este Computador</text>
+        </g>
+        <g font-family="Archivo,sans-serif" font-size="12" fill="#363E58">
+          <text x="220" y="30" font-weight="700" fill="#1C2543">Nome</text><text x="420" y="30" font-weight="700" fill="#1C2543">Status</text>
+          <text x="220" y="58">📄 painel.html</text><circle cx="428" cy="54" r="7" fill="#1E8E5A"/><path d="M424 54l3 3 5-6" stroke="#fff" stroke-width="1.8" fill="none"/>
+          <text x="220" y="84">📁 lib</text><circle cx="428" cy="80" r="7" fill="#1E8E5A"/><path d="M424 80l3 3 5-6" stroke="#fff" stroke-width="1.8" fill="none"/>
+          <text x="220" y="110">📁 eventos</text><circle cx="428" cy="106" r="7" fill="#fff" stroke="#1E8E5A" stroke-width="1.6"/><path d="M424 106l3 3 5-6" stroke="#1E8E5A" stroke-width="1.8" fill="none"/>
+          <text x="444" y="110" font-size="11" fill="#767B8D">só na nuvem: falta "Sempre manter"</text>
+        </g>
+        <g transform="translate(190,120)">
+          <rect width="250" height="100" rx="8" fill="#fff" stroke="#B9BDCC"/>
+          <g font-family="Archivo,sans-serif" font-size="12" fill="#363E58"><text x="14" y="22">Abrir</text><text x="14" y="44">Compartilhar</text>
+          <rect x="6" y="54" width="238" height="24" rx="5" fill="#E3F2EA" stroke="#1E8E5A"/><text x="14" y="70" font-weight="700" fill="#1C2543">Sempre manter neste dispositivo</text>
+          <text x="14" y="92">Liberar espaço</text></g>
+        </g>
+      </svg>
+    </div>
+    <figcaption><span class="tag ilus">Ilustração</span>Explorador de Arquivos do Windows: a pasta sincronizada e o menu do botão direito. Tique verde cheio = arquivo no computador.</figcaption>
+  </figure>
+
+  <h3>Passo 4 · Crie o atalho do painel</h3>
+  <p>Clique com o botão direito em <code>painel.html</code> e escolha <b>Enviar para › Área de trabalho (criar atalho)</b>. No Windows 11, essa opção fica em <b>Mostrar mais opções</b>. Nos próximos dias, é só abrir o painel pelo atalho.</p>
+  <div class="nota">Se a nuvem do OneDrive mostrar um X vermelho ou um aviso, suas alterações ficam só no seu computador até a sincronização voltar. Veja a seção 9.</div>
+</section>
+
+<!-- 3 -->
+<section>
+  <h2><span class="n">03</span>Primeiro acesso ao painel</h2><div class="faixa"></div>
+  <p class="lead">O painel funciona no <b>Microsoft Edge</b> ou no <b>Google Chrome</b>. Firefox e Safari não conseguem gravar na pasta.</p>
+  <ol class="passos">
+    <li><div>Abra o <code>painel.html</code> pelo atalho ou pela pasta sincronizada. Se abrir em outro navegador, clique com o botão direito no arquivo, escolha <b>Abrir com</b> e selecione Edge ou Chrome.</div></li>
+    <li><div>Clique em <span class="btnx">Escolher pasta</span> e selecione a pasta <code>Checklist Rastreador</code> sincronizada, a mesma onde está o <code>painel.html</code>.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura"><img src="img/01-escolher-pasta.png" alt="Tela inicial do painel pedindo para escolher a pasta"></div>
+    <figcaption><span class="tag print">Print</span>Tela que aparece na primeira vez que o painel abre no computador.</figcaption>
+  </figure>
+  <ol class="passos" style="counter-reset:p 2">
+    <li><div>O navegador pergunta se o painel pode ver e editar os arquivos da pasta. Clique em <b>Editar arquivos</b> (ou <b>Permitir</b>).</div></li>
+  </ol>
+  <figure class="estreita">
+    <div class="moldura">
+      <svg viewBox="0 0 460 150" role="img" aria-label="Pergunta do navegador sobre permissão de edição" style="width:360px">
+        <rect x="1" y="1" width="458" height="148" rx="10" fill="#fff" stroke="#B9BDCC"/>
+        <text x="20" y="34" font-family="Archivo,sans-serif" font-size="14" font-weight="700" fill="#1C2543">Salvar alterações em Checklist Rastreador?</text>
+        <text x="20" y="58" font-family="Archivo,sans-serif" font-size="12" fill="#5C6486">O site poderá editar arquivos em "Checklist Rastreador"</text>
+        <text x="20" y="76" font-family="Archivo,sans-serif" font-size="12" fill="#5C6486">até você fechar todas as guias dele.</text>
+        <rect x="236" y="100" width="100" height="32" rx="16" fill="#1C2543"/><text x="286" y="121" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12.5" font-weight="700" fill="#fff">Editar arquivos</text>
+        <rect x="346" y="100" width="94" height="32" rx="16" fill="#fff" stroke="#B9BDCC"/><text x="393" y="121" text-anchor="middle" font-family="Archivo,sans-serif" font-size="12.5" fill="#1C2543">Cancelar</text>
+      </svg>
+    </div>
+    <figcaption><span class="tag ilus">Ilustração</span>Pergunta de permissão do Edge ou do Chrome. O texto exato muda conforme a versão do navegador.</figcaption>
+  </figure>
+  <ol class="passos" style="counter-reset:p 3">
+    <li><div>Escolha seu nome na lista. Se ele não estiver lá, digite e clique em <span class="btnx">Entrar com esse nome</span>. Use sempre o mesmo nome: é ele que aparece no histórico de tudo o que você fizer.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura"><img src="img/02-nome.png" alt="Tela de escolha do nome"></div>
+    <figcaption><span class="tag print">Print</span>Escolha do nome. Os nomes já cadastrados aparecem como botões.</figcaption>
+  </figure>
+  <p>O navegador lembra a pasta e o nome. Em algumas aberturas ele mostra <b>Permitir acesso à pasta</b>: é só clicar para confirmar. Para trocar de usuário no mesmo computador, use a caixa <b>Você</b>, no canto de cima.</p>
+</section>
+
+<!-- 4 -->
+<section>
+  <h2><span class="n">04</span>Como a fila funciona</h2><div class="faixa"></div>
+  <p class="lead">Cada veículo fica numa de cinco situações, mostradas nesta ordem de cima para baixo. Dentro de cada situação, o vencimento mais próximo vem primeiro.</p>
+  <figure>
+    <div class="moldura"><img src="img/03-fila.png" alt="Fila de veículos com os contadores por situação"></div>
+    <figcaption><span class="tag print">Print</span>A fila. Os contadores no topo filtram a lista com um clique, e a busca acha a placa do veículo ou de uma carreta.</figcaption>
+  </figure>
+  <h3>O que significa cada situação</h3>
+  <table>
+    <thead><tr><th style="width:30%">Situação</th><th>O veículo está aqui quando</th><th style="width:30%">O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td><span class="st nec">Necessário realizar checklist</span></td><td>Faltam 15 dias ou menos para vencer, já venceu (etiqueta <b>Vencido</b>) ou o último PDF foi reprovado</td><td>Fazer o checklist na Raster e importar o PDF</td></tr>
+      <tr><td><span class="st con">Checklist feito – confirmar validação</span></td><td>Chegou um PDF aprovado que ninguém conferiu</td><td>Validar e lançar (seção 6)</td></tr>
+      <tr><td><span class="st man">Manutenção</span></td><td>Uma pessoa marcou</td><td>Voltar ao cálculo automático quando o veículo sair da oficina</td></tr>
+      <tr><td><span class="st can">Checklist cancelado</span></td><td>Uma pessoa marcou</td><td>Voltar ao cálculo automático quando fizer sentido</td></tr>
+      <tr><td><span class="st val">Validado e lançado</span></td><td>O checklist foi conferido e faltam mais de 15 dias para vencer</td><td>Nada. Ele volta sozinho para o topo a 15 dias do vencimento</td></tr>
+    </tbody>
+  </table>
+  <h3 class="nova">Como o veículo muda de situação</h3>
+  <figure>
+    <div class="moldura" style="background:#fff;padding:8px">
+      <svg viewBox="0 0 760 450" role="img" aria-label="Só a validação leva o veículo ao fim da fila" font-family="Archivo,sans-serif" font-size="13">
+        <defs><marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8A8FA0"/></marker></defs>
+        <text x="24" y="30" font-size="15" font-weight="700" fill="#1C2543">Só a validação leva o veículo ao fim da fila</text>
+        <g fill="none" stroke="#8A8FA0" stroke-width="1.4">
+          <path d="M380 100V172" marker-end="url(#seta)"/>
+          <path d="M266 80H120V172" marker-end="url(#seta)"/>
+          <path d="M480 200H540" marker-end="url(#seta)"/>
+          <path d="M640 228V268H120V228" marker-end="url(#seta)"/>
+          <path d="M380 316V228" marker-end="url(#seta)"/>
+        </g>
+        <rect x="266" y="60" width="228" height="40" rx="8" fill="#fff" stroke="#8A8FA0" stroke-width="1.3"/><text x="380" y="85" text-anchor="middle" font-weight="700" fill="#1C2543">PDF da Raster importado</text>
+        <rect x="20" y="172" width="200" height="56" rx="8" fill="#F9E1E6" stroke="#C22C4C" stroke-width="1.3"/><text x="120" y="197" text-anchor="middle" fill="#C22C4C" font-weight="700">Necessário realizar</text><text x="120" y="213" text-anchor="middle" fill="#C22C4C" font-weight="700">checklist</text>
+        <rect x="280" y="172" width="200" height="56" rx="8" fill="#FBF1D9" stroke="#C99A2E" stroke-width="1.3"/><text x="380" y="197" text-anchor="middle" fill="#6B4E0E" font-weight="700">Checklist feito –</text><text x="380" y="213" text-anchor="middle" fill="#6B4E0E" font-weight="700">confirmar validação</text>
+        <rect x="540" y="172" width="200" height="56" rx="8" fill="#E3F2EA" stroke="#1E8E5A" stroke-width="2"/><text x="640" y="204" text-anchor="middle" fill="#1E8E5A" font-weight="700">Validado e lançado</text>
+        <g font-size="11.5" fill="#5C6486"><text x="390" y="140">aprovado</text><text x="193" y="72" text-anchor="middle">reprovado</text><text x="510" y="162" text-anchor="middle">Validar e lançar</text><text x="410" y="260" text-anchor="middle">faltam 15 dias para vencer</text><text x="390" y="296">PDF aprovado novo</text></g>
+        <rect x="120" y="316" width="520" height="104" rx="8" fill="#F3F4F8" stroke="#8A8FA0" stroke-width="1.2"/>
+        <text x="136" y="338" font-size="11.5" font-weight="700" fill="#5C6486">Situação manual · marcada por uma pessoa</text>
+        <rect x="160" y="364" width="200" height="40" rx="8" fill="#E5E7EF" stroke="#5C6486" stroke-width="1.2"/><text x="260" y="388" text-anchor="middle" fill="#5C6486" font-weight="700">Manutenção</text>
+        <rect x="400" y="364" width="200" height="40" rx="8" fill="#F0E6F1" stroke="#7E4E86" stroke-width="1.2"/><text x="500" y="388" text-anchor="middle" fill="#7E4E86" font-weight="700">Checklist cancelado</text>
+        <text x="24" y="442" font-size="11.5" fill="#5C6486">Qualquer veículo pode ir para a situação manual. Ele só sai por outra pessoa ou quando chega um PDF aprovado novo.</text>
+      </svg>
+    </div>
+    <figcaption><span class="tag ilus">Esquema</span>O painel calcula a situação a partir do PDF e do vencimento. Só a validação e a situação manual dependem de uma pessoa.</figcaption>
+  </figure>
+</section>
+
+<!-- 5 -->
+<section>
+  <h2><span class="n">05</span>Importar checklists da Raster</h2><div class="faixa"></div>
+  <p class="lead">Importar o PDF é o que coloca um checklist novo na fila. Não há nada para digitar.</p>
+  <ol class="passos">
+    <li><div>No portal da Raster, abra <b>Geração Aprovação/Reprovação do CheckList</b> e baixe o PDF do checklist.</div></li>
+    <li><div>No painel, arraste o PDF (ou vários de uma vez) para qualquer lugar da tela. Outra opção: aba <b>Importar checklists</b> › <span class="btnx">Escolher arquivos</span>.</div></li>
+    <li><div>Confira o resultado de cada arquivo na lista que aparece embaixo.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura"><img src="img/04-importar.png" alt="Aba Importar checklists com um PDF importado"></div>
+    <figcaption><span class="tag print">Print</span>PDF da UVR1I58 importado: aprovado, vai para "Checklist feito – confirmar validação".</figcaption>
+  </figure>
+  <table>
+    <thead><tr><th style="width:30%">Aparece</th><th>O que aconteceu</th></tr></thead>
+    <tbody>
+      <tr><td><span class="st val">Importado</span> · Aprovado</td><td>O veículo vai para "Checklist feito – confirmar validação". Falta validar (seção 6)</td></tr>
+      <tr><td><span class="st val">Importado</span> · Reprovado</td><td>O veículo vai para "Necessário realizar checklist"</td></tr>
+      <tr><td><span class="st man">Já importado</span></td><td>Esse checklist já estava na fila. O aviso diz quem importou e quando. Nada muda</td></tr>
+      <tr><td><span class="st nec">Erro</span></td><td>O arquivo não é um checklist da Raster ou está incompleto. Baixe o PDF de novo</td></tr>
+    </tbody>
+  </table>
+  <p>O painel lê do PDF a placa do veículo, as carretas, o resultado, a data do teste, o vencimento, o perfil de segurança e o código do checklist. Uma cópia do PDF fica em <code>checklists/&lt;placa&gt;/</code>, e qualquer pessoa abre pelo botão <b>Abrir PDF</b> no detalhe do veículo.</p>
+  <p>Um veículo novo na frota entra na fila sozinho quando o primeiro checklist dele é importado. Trocar de carreta não exige checklist novo: ele vale para o veículo até o vencimento.</p>
+</section>
+
+<!-- 6 -->
+<section>
+  <h2><span class="n">06</span>Validar e lançar no Rodopar</h2><div class="faixa"></div>
+  <p class="lead">Validar é a conferência humana de um checklist aprovado. É o que leva o veículo para o fim da fila, em "Validado e lançado".</p>
+  <ol class="passos">
+    <li><div>Lance a informação no Rodopar, como hoje.</div></li>
+    <li><div>No painel, clique em <span class="btnx g">Validar e lançar</span> na linha do veículo. O botão só aparece em "Checklist feito – confirmar validação".</div></li>
+    <li><div>Confira o quadro amarelo <b>Conferir antes de validar</b>: placa, carretas, resultado e vencimento lidos do PDF. Se tiver dúvida, use <span class="btnx l">Abrir PDF</span>.</div></li>
+    <li><div>Clique em <span class="btnx g">Validar e lançar no Rodopar</span>.</div></li>
+  </ol>
+  <figure class="det">
+    <div class="moldura"><img src="img/05-conferir.png" alt="Detalhe do veículo com o quadro Conferir antes de validar"></div>
+    <figcaption><span class="tag print">Print</span>Detalhe do veículo aberto para validar. O quadro amarelo traz o que conferir.</figcaption>
+  </figure>
+  <p>O painel registra seu nome e o horário. A validação vale para aquele checklist: quando chegar um checklist novo do mesmo veículo, ele precisa ser validado de novo.</p>
+</section>
+
+<!-- 7 -->
+<section>
+  <h2><span class="n">07</span>Manutenção, cancelado, observação e desativação</h2><div class="faixa"></div>
+  <p class="lead">Tudo isso fica no detalhe do veículo: clique em qualquer linha da fila para abrir. Os botões ficam no quadro <b>Situação manual</b>, à direita (veja o print da seção 6).</p>
+  <table>
+    <thead><tr><th style="width:26%">Para</th><th style="width:36%">Faça</th><th>O que acontece</th></tr></thead>
+    <tbody>
+      <tr><td>Veículo foi para a oficina</td><td><span class="btnx l">Manutenção</span></td><td>Fica em Manutenção até alguém mudar ou chegar um checklist novo</td></tr>
+      <tr><td>Checklist foi cancelado</td><td><span class="btnx l">Checklist cancelado</span></td><td>Mesma regra da Manutenção</td></tr>
+      <tr><td>Desfazer Manutenção ou Cancelado</td><td><span class="btnx l">Voltar ao cálculo automático</span></td><td>O painel recalcula a situação pelo checklist e pelo vencimento</td></tr>
+      <tr><td>Anotar algo sobre o veículo</td><td>Escreva em <b>Observação</b> › <span class="btnx l">Salvar observação</span></td><td>O texto aparece na fila e fica no histórico</td></tr>
+      <tr><td>Veículo saiu da frota</td><td><b>Desativar veículo</b> e clique de novo para confirmar</td><td>Sai da fila e dos contadores. Continua no botão <b>Desativados</b></td></tr>
+      <tr><td>Veículo voltou</td><td>Em <b>Desativados</b>, abra o veículo › <b>Reativar veículo</b></td><td>Volta para a fila com o histórico inteiro</td></tr>
+    </tbody>
+  </table>
+  <p>Nada é apagado de verdade. O <b>Histórico</b>, no fim do detalhe, mostra cada alteração do veículo com data, hora e quem fez.</p>
+</section>
+
+<!-- 8 -->
+<section>
+  <h2><span class="n">08</span>Trabalhando em equipe</h2><div class="faixa"></div>
+  <p class="lead">Várias pessoas podem usar o painel ao mesmo tempo. Cada alteração é salva na hora, num arquivo próprio, então ninguém apaga o trabalho do outro. Não existe botão Salvar.</p>
+  <div class="duas">
+    <div>
+      <h3 style="margin-top:0">Quem está no painel</h3>
+      <p><b>No painel agora</b>, no canto de cima, mostra quem deu sinal nos últimos 3 minutos. Quem acabou de fechar o painel ainda aparece por 2 ou 3 minutos.</p>
+      <p>Ao lado do nome da pasta aparece o horário em que o painel leu a pasta pela última vez. Ele relê a cada 20 segundos e sempre que você volta para a janela dele.</p>
+    </div>
+    <figure class="estreita" style="margin-top:0">
+      <div class="moldura"><img src="img/07-presenca.png" alt="Canto superior do painel com quem está usando" style="width:300px"></div>
+      <figcaption><span class="tag print">Print</span>Pasta lida às 14:51; Ana Paula e Jader Moreira no painel.</figcaption>
+    </figure>
+  </div>
+  <p>A aba <b>Pessoas</b> mostra quem usa o painel. Dá para adicionar e remover nomes; a remoção pede um segundo clique para confirmar.</p>
+  <h3>Quando um colega mexe no mesmo veículo</h3>
+  <ul>
+    <li><b>Faixa amarela no detalhe:</b> aparece quando outra pessoa alterou aquele veículo nos últimos 10 minutos e diz o que ela fez. Confira antes de mudar algo.</li>
+    <li><b>Aviso "acabou de alterar":</b> se um colega mexer no veículo enquanto você está com o detalhe aberto, o painel não grava sua ação e mostra a situação nova. Se ainda fizer sentido, repita a ação.</li>
+    <li><b>Duas pessoas no mesmo minuto:</b> as duas alterações ficam no histórico, e vale a mais recente.</li>
+  </ul>
+  <figure class="det">
+    <div class="moldura"><img src="img/06-aviso-colega.png" alt="Detalhe do veículo com a faixa amarela de alteração recente de uma colega"></div>
+    <figcaption><span class="tag print">Print</span>A Ana Paula colocou a QQV4574 em Manutenção e escreveu uma observação há 2 minutos.</figcaption>
+  </figure>
+</section>
+
+<!-- 9 -->
+<section>
+  <h2><span class="n">09</span>Problemas comuns</h2><div class="faixa"></div>
+  <table>
+    <thead><tr><th style="width:38%">Problema</th><th>Como resolver</th></tr></thead>
+    <tbody>
+      <tr><td>Aparece "Abra este painel no Microsoft Edge ou no Google Chrome"</td><td>O arquivo abriu em outro navegador. Botão direito em <code>painel.html</code> › <b>Abrir com</b> › Edge ou Chrome</td></tr>
+      <tr><td>Aparece "Reconectar à pasta"</td><td>Clique em <b>Permitir acesso à pasta</b>. É o navegador pedindo confirmação; nada se perdeu</td></tr>
+      <tr><td>A fila abriu vazia, mas os colegas veem veículos</td><td>Você escolheu outra pasta. Use <b>Escolher outra pasta</b> e selecione a pasta sincronizada onde está o <code>painel.html</code></td></tr>
+      <tr><td>A alteração de um colega não aparece</td><td>Confira se a nuvem do OneDrive está azul, sem aviso, no seu computador e no dele. Espere um ou dois minutos</td></tr>
+      <tr><td>Aparece "Não foi possível salvar na pasta"</td><td>Sua conta não tem permissão de edição na pasta, ou o OneDrive está pausado. Peça acesso de edição a quem administra a pasta</td></tr>
+      <tr><td>"Abrir PDF" diz que não encontrou o arquivo</td><td>O PDF ainda está sincronizando. Tente de novo em instantes</td></tr>
+      <tr><td>Apareceu um arquivo com nome de computador, como <code>2210098-PC01.pdf</code></td><td>Duas pessoas importaram o mesmo PDF ao mesmo tempo e o OneDrive criou uma cópia. Pode apagar a cópia; o checklist conta uma vez só</td></tr>
+      <tr><td>Escolhi o nome errado</td><td>Troque na caixa <b>Você</b>, no canto de cima. O que já foi feito continua com o nome anterior</td></tr>
+    </tbody>
+  </table>
+</section>
+</body>
+</html>
