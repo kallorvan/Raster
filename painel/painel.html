@@ -666,7 +666,7 @@ function renderFila() {
 
 function linha(v) {
   const rel = relativo(v);
-  const res = v.resultado ? `<span class="st ${v.resultado}">${NOME_RES[v.resultado]}</span>` : `<span class="muted">${v.atual?.origem === 'planilha' ? 'da planilha' : '—'}</span>`;
+  const res = v.resultado ? `<span class="st ${v.resultado}">${NOME_RES[v.resultado]}</span>` : `<span class="muted">${v.atual?.origem === 'planilha' ? 'aguardando PDF' : '—'}</span>`;
   const sit = `<span class="st ${v.situacao}">${esc(NOME_SIT[v.situacao])}</span>` + (v.vencido ? ' <span class="st vencido">Vencido</span>' : '');
   const acao = v.situacao === 'confirmar' && v.ativo ? `<button class="send" type="button" data-validar="${v.placa}">Validar e lançar</button>` : '';
   return `<tr class="click" tabindex="0" data-placa="${v.placa}">
