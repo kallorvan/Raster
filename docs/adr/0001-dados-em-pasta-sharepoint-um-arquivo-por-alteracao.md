@@ -14,3 +14,4 @@ A fila é usada por várias pessoas e precisa de dados compartilhados sem servid
 - Alterações de colegas aparecem com o atraso da sincronização do OneDrive, de segundos a minutos, e não em tempo real.
 - Não há login: o painel identifica a pessoa por um nome escolhido no PC, e qualquer um com acesso à pasta pode alterar a fila.
 - A fila é montada lendo todos os arquivos de alteração, e esse conjunto de arquivos é também o histórico de quem fez o quê.
+- A pasta fica na biblioteca de um time do Teams ("Checklist Rastreador - Raster"), não no OneDrive pessoal de alguém: o acesso é gerenciado pelos proprietários do time e os dados não dependem da conta de uma pessoa.

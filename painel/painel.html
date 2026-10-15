@@ -230,7 +230,7 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
         <label for="eu">Você</label>
         <select id="eu" aria-label="Quem está usando o painel"></select>
       </div>
-      <div class="sync" id="sync"><span class="sd"></span><span id="sync-t">Sem pasta conectada</span></div>
+      <div class="sync" id="sync"><span class="sd"></span><span id="sync-t">Sem pasta conectada</span><button class="linkbtn" type="button" id="trocar" hidden>trocar pasta</button></div>
       <div class="pres" id="pres" aria-live="polite"></div>
     </div>
   </div>
@@ -423,7 +423,9 @@ async function escolherPasta() {
   try {
     const h = await window.showDirectoryPicker({ id: 'raster-fila', mode: 'readwrite' });
     try { await idbSet('pasta', h); } catch {}
-    st.root = h; conectado();
+    // pasta nova: descarta o que foi lido da anterior
+    st.root = h; st.nomePasta = null; st.arquivos = new Map(); st.presenca = []; st.erro = null;
+    conectado();
   } catch (e) { if (e.name !== 'AbortError') aviso('Não foi possível usar a pasta: ' + e.message, 'err'); }
 }
 
@@ -563,6 +565,7 @@ function render() {
 function renderTopo() {
   const s = $('#sync');
   s.className = 'sync ' + (st.erro ? 'err' : st.root ? (DEMO ? 'local' : 'on') : '');
+  $('#trocar').hidden = !st.root || DEMO;
   $('#sync-t').textContent = st.erro ? st.erro
     : st.root ? `Pasta "${st.nomePasta}"${st.ultimaLeitura ? ' · lida às ' + fmtHora(st.ultimaLeitura) : ''}` : 'Sem pasta conectada';
   const eu = $('#eu');
@@ -571,6 +574,7 @@ function renderTopo() {
   const outros = st.presenca.filter(p => p.pessoa);
   $('#pres').innerHTML = outros.length ? 'No painel agora: ' + outros.map(p => `<b title="último sinal às ${fmtHora(new Date(p.ts))}">${esc(p.pessoa)}</b>`).join('') : '';
 }
+$('#trocar').addEventListener('click', escolherPasta);
 $('#eu').addEventListener('change', e => {
   if (e.target.value === '__outro') { st.pessoa = null; lsSet('raster.pessoa', null); entrarOuPerguntar(); return; }
   definirPessoa(e.target.value); presenca();
