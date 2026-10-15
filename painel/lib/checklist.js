@@ -100,6 +100,7 @@
     const veiculos = new Map();
     const pessoas = new Map();
     const codigos = new Map(); // código Raster -> evento de importação
+    let admin = null; // senha do administrador (só ele cadastra e remove pessoas)
     const vei = (placa) => {
       if (!veiculos.has(placa)) {
         veiculos.set(placa, {
@@ -112,6 +113,7 @@
     for (const e of ord) {
       if (e.tipo === 'pessoa_adicionada') { pessoas.set(e.dados.nome, true); continue; }
       if (e.tipo === 'pessoa_removida') { pessoas.delete(e.dados.nome); continue; }
+      if (e.tipo === 'admin_definido') { admin = { nome: e.dados.nome, salt: e.dados.salt, hash: e.dados.hash, ts: e.ts }; continue; }
       if (!e.placa) continue;
       const v = vei(e.placa);
       v.historico.push(e);
@@ -156,7 +158,7 @@
       }
     }
     for (const v of veiculos.values()) classificar(v, agora);
-    return { veiculos: [...veiculos.values()], pessoas: [...pessoas.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR')), codigos };
+    return { veiculos: [...veiculos.values()], pessoas: [...pessoas.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR')), codigos, admin };
   }
 
   function classificar(v, agora) {

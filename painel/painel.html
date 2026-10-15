@@ -252,12 +252,18 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
   <!-- quem é você -->
   <section id="quem" class="card empty sec" hidden>
     <div class="big">Quem está usando este painel?</div>
-    <p>Escolha seu nome. Ele fica registrado em cada alteração que você fizer e aparece para os colegas como "no painel agora". O navegador lembra a escolha neste PC.</p>
+    <p>Escolha seu nome na lista. Ele fica registrado em cada alteração que você fizer e aparece para os colegas como "no painel agora". O navegador lembra a escolha neste PC.</p>
     <div class="pessoas" id="quem-lista"></div>
-    <form class="addrow" id="quem-form">
-      <input class="inp" id="quem-nome" placeholder="Seu nome" autocomplete="off" aria-label="Seu nome" maxlength="40">
-      <button class="btn" type="submit">Entrar com esse nome</button>
-    </form>
+    <p class="sec-note" id="quem-nota" style="margin:0">Seu nome não está na lista? Peça ao administrador do painel para cadastrar.</p>
+    <div id="adm-novo" hidden style="display:grid;gap:10px;justify-items:center;border-top:1px solid var(--line);padding-top:16px;margin-top:6px;width:100%">
+      <p style="margin:0"><b>O painel ainda não tem administrador.</b> Quem administra se cadastra aqui primeiro: só o administrador cadastra e remove nomes, usando a senha criada agora.</p>
+      <form class="addrow" id="adm-form">
+        <input class="inp" id="adm-nome" placeholder="Seu nome" autocomplete="off" aria-label="Seu nome" maxlength="40">
+        <input class="inp" id="adm-senha" type="password" placeholder="Crie a senha (mín. 4)" autocomplete="new-password" aria-label="Senha do administrador">
+        <input class="inp" id="adm-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" aria-label="Repita a senha">
+        <button class="btn" type="submit">Ser o administrador</button>
+      </form>
+    </div>
   </section>
 
   <!-- FILA -->
@@ -297,12 +303,18 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
   <!-- PESSOAS -->
   <section id="v-pes" role="tabpanel" aria-labelledby="tab-pes" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Pessoas que usam o painel</h2><span class="sec-note">Lista compartilhada por todos</span></div>
+      <div class="sec-h"><h2>Pessoas que usam o painel</h2><span class="sec-note" id="pes-adm"></span></div>
       <div class="card pad">
         <div class="pessoas" id="pes-lista" style="justify-content:flex-start"></div>
-        <form class="addrow" id="pes-form" style="justify-content:flex-start;margin-top:14px">
+        <form class="addrow" id="pes-unlock" style="justify-content:flex-start;margin-top:14px">
+          <input class="inp" id="pes-senha" type="password" placeholder="Senha do administrador" autocomplete="current-password" aria-label="Senha do administrador">
+          <button class="btn ghost" type="submit" id="pes-unlock-btn">Gerenciar nomes</button>
+          <span class="sec-note" id="pes-unlock-nota">Só o administrador cadastra e remove nomes.</span>
+        </form>
+        <form class="addrow" id="pes-form" hidden style="justify-content:flex-start;margin-top:14px">
           <input class="inp" id="pes-nome" placeholder="Nome da pessoa" autocomplete="off" aria-label="Nome da pessoa" maxlength="40">
           <button class="btn ghost" type="submit">Adicionar</button>
+          <button class="linkbtn" type="button" id="pes-bloquear">bloquear de novo</button>
         </form>
       </div>
     </div>
@@ -512,23 +524,46 @@ async function presenca() {
 
 /* ---------- quem é você ---------- */
 function entrarOuPerguntar() {
-  if (st.pessoa) { mostrarApp(); return; }
+  // só entra com um nome cadastrado; nome removido da lista volta para a escolha
+  if (st.pessoa && st.estado.pessoas.includes(st.pessoa)) { mostrarApp(); return; }
   ['#tabs', '#v-fila', '#v-imp', '#v-pes', '#eu-wrap', '#rodape'].forEach(s => $(s).hidden = true);
   $('#quem').hidden = false;
   const l = $('#quem-lista'); l.innerHTML = '';
   for (const n of st.estado.pessoas) l.append(botao(n, 'chip', () => definirPessoa(n)));
-  if (!st.estado.pessoas.length) l.innerHTML = '<span class="sec-note">Ninguém cadastrado ainda: você será o primeiro.</span>';
-  $('#quem-nome').focus();
+  if (!st.estado.pessoas.length) l.innerHTML = '<span class="sec-note">Nenhum nome cadastrado ainda.</span>';
+  $('#adm-novo').hidden = !!st.estado.admin;
+  $('#quem-nota').hidden = !st.estado.admin;
 }
-async function definirPessoa(nome, nova) {
-  nome = String(nome || '').trim().replace(/\s+/g, ' ');
-  if (!nome) return;
+function definirPessoa(nome) {
   st.pessoa = nome; lsSet('raster.pessoa', nome);
-  if (nova && !st.estado.pessoas.some(p => p.toLowerCase() === nome.toLowerCase())) await acao(() => gravar('pessoa_adicionada', null, { nome }));
   $('#quem').hidden = true;
   mostrarApp();
 }
-$('#quem-form').addEventListener('submit', e => { e.preventDefault(); definirPessoa($('#quem-nome').value, true); });
+const limparNome = s => String(s || '').trim().replace(/\s+/g, ' ');
+async function hashSenha(senha, salt) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + senha));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function senhaConfere(senha) {
+  const a = st.estado.admin;
+  return !!a && await hashSenha(senha, a.salt) === a.hash;
+}
+$('#adm-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (st.estado.admin) { entrarOuPerguntar(); return; }
+  const nome = limparNome($('#adm-nome').value), s1 = $('#adm-senha').value, s2 = $('#adm-senha2').value;
+  if (!nome) { aviso('Digite seu nome.', 'info'); return; }
+  if (s1.length < 4) { aviso('A senha precisa ter pelo menos 4 caracteres.', 'info'); return; }
+  if (s1 !== s2) { aviso('As duas senhas não são iguais.', 'info'); return; }
+  const salt = novoId() + novoId();
+  st.pessoa = nome;
+  await acao(async () => {
+    if (!st.estado.pessoas.includes(nome)) await gravar('pessoa_adicionada', null, { nome });
+    await gravar('admin_definido', null, { nome, salt, hash: await hashSenha(s1, salt) });
+  }, `${nome} é o administrador do painel.`);
+  st.adminOk = true;
+  definirPessoa(nome);
+});
 
 function mostrarApp() {
   ['#tabs', '#eu-wrap', '#rodape'].forEach(s => $(s).hidden = false);
@@ -853,18 +888,37 @@ document.addEventListener('drop', e => { if (!st.pessoa || !e.dataTransfer?.file
 /* ---------- pessoas ---------- */
 const armadas = new Set();
 function renderPessoas() {
-  const l = $('#pes-lista');
-  l.innerHTML = st.estado.pessoas.map(n => `<span class="chip" style="cursor:default;display:inline-flex;gap:8px;align-items:center">${esc(n)}${n === st.pessoa ? ' <span class="muted">(você)</span>' : ` <button class="linkbtn" type="button" data-rm="${esc(n)}">${armadas.has(n) ? 'confirmar remoção' : 'remover'}</button>`}</span>`).join('') || '<span class="sec-note">Nenhuma pessoa cadastrada.</span>';
+  const l = $('#pes-lista'), adm = st.estado.admin;
+  l.innerHTML = st.estado.pessoas.map(n => `<span class="chip" style="cursor:default;display:inline-flex;gap:8px;align-items:center">${esc(n)}${n === st.pessoa ? ' <span class="muted">(você)</span>' : (st.adminOk ? ` <button class="linkbtn" type="button" data-rm="${esc(n)}">${armadas.has(n) ? 'confirmar remoção' : 'remover'}</button>` : '')}</span>`).join('') || '<span class="sec-note">Nenhuma pessoa cadastrada.</span>';
+  $('#pes-adm').textContent = adm ? `Administrador: ${adm.nome}` : 'Sem administrador';
+  $('#pes-unlock').hidden = !!st.adminOk;
+  $('#pes-unlock-btn').textContent = adm ? 'Gerenciar nomes' : 'Criar senha e ser o administrador';
+  $('#pes-unlock-nota').textContent = adm ? 'Só o administrador cadastra e remove nomes.' : `Ainda não há administrador. Quem criar a senha agora (${st.pessoa || ''}) passa a ser o único que cadastra e remove nomes.`;
+  $('#pes-form').hidden = !st.adminOk;
 }
+$('#pes-unlock').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!st.estado.admin) {
+    const s = $('#pes-senha').value;
+    if (s.length < 4) { aviso('A senha precisa ter pelo menos 4 caracteres.', 'info'); return; }
+    const salt = novoId() + novoId();
+    await acao(async () => gravar('admin_definido', null, { nome: st.pessoa, salt, hash: await hashSenha(s, salt) }), `${st.pessoa} é o administrador do painel. Guarde a senha.`);
+    $('#pes-senha').value = ''; st.adminOk = !!st.estado.admin; renderPessoas(); return;
+  }
+  if (!await senhaConfere($('#pes-senha').value)) { aviso('Senha do administrador incorreta.', 'err'); return; }
+  $('#pes-senha').value = ''; st.adminOk = true; renderPessoas(); $('#pes-nome').focus();
+});
+$('#pes-bloquear').addEventListener('click', () => { st.adminOk = false; armadas.clear(); renderPessoas(); });
 $('#pes-lista').addEventListener('click', e => {
-  const b = e.target.closest('[data-rm]'); if (!b) return;
+  const b = e.target.closest('[data-rm]'); if (!b || !st.adminOk) return;
   const n = b.dataset.rm;
   if (!armadas.has(n)) { armadas.add(n); renderPessoas(); return; }
   armadas.delete(n); acao(() => gravar('pessoa_removida', null, { nome: n }), `${n} removido da lista.`);
 });
 $('#pes-form').addEventListener('submit', e => {
   e.preventDefault();
-  const nome = $('#pes-nome').value.trim().replace(/\s+/g, ' ');
+  if (!st.adminOk) return;
+  const nome = limparNome($('#pes-nome').value);
   if (!nome) return;
   if (st.estado.pessoas.some(p => p.toLowerCase() === nome.toLowerCase())) { aviso(`${nome} já está na lista.`, 'info'); return; }
   acao(() => gravar('pessoa_adicionada', null, { nome }), `${nome} adicionado.`).then(() => { $('#pes-nome').value = ''; });

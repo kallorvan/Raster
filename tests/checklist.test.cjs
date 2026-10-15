@@ -140,3 +140,12 @@ test('pessoas adicionadas e removidas', () => {
   const evs = [ev('pessoa_adicionada', null, { nome: 'Ana Paula' }), ev('pessoa_adicionada', null, { nome: 'Jader' }), ev('pessoa_removida', null, { nome: 'Ana Paula' })];
   assert.deepEqual(estado(evs).pessoas, ['Jader']);
 });
+
+test('administrador: vale o último definido', () => {
+  assert.equal(estado([]).admin, null);
+  const evs = [
+    ev('admin_definido', null, { nome: 'Laudino', salt: 's1', hash: 'h1' }),
+    ev('admin_definido', null, { nome: 'Laudino', salt: 's2', hash: 'h2' }),
+  ];
+  assert.deepEqual({ ...estado(evs).admin, ts: undefined }, { nome: 'Laudino', salt: 's2', hash: 'h2', ts: undefined });
+});
