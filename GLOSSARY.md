@@ -28,6 +28,10 @@ _Evitar_: expiração, validade
 Caminhão identificado pela placa, que é a unidade da fila.
 _Evitar_: cavalo, placa, caminhão
 
+**Desativação**:
+Retirada de um veículo da fila (venda, saída da frota), preservando o histórico; pode ser desfeita reativando-o.
+_Evitar_: exclusão, remoção
+
 **Carreta**:
 Implemento engatado ao veículo, registrado no checklist (Carreta 01, 02, 03). Trocar de carreta não exige novo checklist.
 _Evitar_: reboque
