@@ -94,6 +94,8 @@ tbody tr{break-inside:avoid}
 .btnx.l{background:#fff;color:var(--ink);border-color:var(--line)}
 figure.det .moldura{width:78%;margin:0 auto}
 figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
+figure.menor .moldura,figure.menor figcaption{width:84%;margin-left:auto;margin-right:auto}
+figure.det2 .moldura,figure.det2 figcaption{width:60%}
 .duas{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 </style>
 </head>
@@ -117,7 +119,7 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
   <h2>O que tem neste manual</h2>
   <div class="faixa"></div>
   <ol>
-    <li><span>01</span><div>Preparar a pasta no SharePoint<small>Uma vez, por quem administra o painel</small></div></li>
+    <li><span>01</span><div>Preparar a pasta no Teams<small>Uma vez, por quem administra o painel</small></div></li>
     <li><span>02</span><div>Sincronizar a pasta no seu computador<small>Cada pessoa, uma vez</small></div></li>
     <li><span>03</span><div>Primeiro acesso ao painel<small>Escolher a pasta e o seu nome</small></div></li>
     <li><span>04</span><div>Como a fila funciona<small>As cinco situações e o que muda cada uma</small></div></li>
@@ -131,19 +133,34 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
     <div><h4>Vai usar o painel?</h4><p>Leia as seções 2 e 3 uma vez para instalar no seu computador. Depois, as seções 4 a 8 explicam o dia a dia.</p></div>
     <div><h4>Vai administrar a pasta?</h4><p>Comece pela seção 1. Ela só precisa ser feita uma vez para toda a equipe.</p></div>
   </div>
-  <div class="nota" style="margin-top:18px"><b>Sobre as imagens:</b> as marcadas como <b>print</b> são do próprio painel. As marcadas como <b>ilustração</b> mostram telas do SharePoint, do OneDrive e do Windows de forma simplificada; a tela no seu computador pode ter outra aparência, mas os nomes dos botões são os mesmos.</div>
+  <div class="nota" style="margin-top:18px"><b>Sobre as imagens:</b> as marcadas como <b>print</b> são telas reais do painel, do Teams e do SharePoint. As marcadas como <b>ilustração</b> mostram telas do OneDrive, do Windows e do navegador de forma simplificada; a tela no seu computador pode ter outra aparência, mas os nomes dos botões são os mesmos.</div>
 </div>
 
 <!-- 1 -->
 <section>
-  <h2><span class="n">01</span>Preparar a pasta no SharePoint</h2><div class="faixa"></div>
-  <p class="lead">Feito uma vez, por quem administra o painel. Quem só vai usar pula para a seção 2.</p>
+  <h2><span class="n">01</span>Preparar a pasta no Teams</h2><div class="faixa"></div>
+  <p class="lead">Feito uma vez, por quem administra o painel. Quem só vai usar pula para a seção 2. A pasta fica num time do Teams, e não no OneDrive de uma pessoa: o acesso não depende de ninguém em particular e os dados não somem se uma conta for desativada.</p>
   <ol class="passos">
-    <li><div>No SharePoint, crie uma pasta para a fila, por exemplo <code>Checklist Rastreador</code>.</div></li>
-    <li><div>Dê permissão de <b>edição</b> a todos que vão usar o painel. Quem só tiver leitura vê a fila, mas o painel não consegue gravar o que essa pessoa fizer.</div></li>
-    <li><div>Extraia o <code>checklist-rastreador.zip</code> direto dentro da pasta, sem criar uma subpasta a mais.</div></li>
-    <li><div>Extraia o <code>planilha-inicial.zip</code> na mesma pasta. Ele traz os 87 veículos da planilha antiga.</div></li>
+    <li><div>No Teams, abra <b>Equipes</b> › <b>+</b> › <b>Criar equipe</b> › <b>Do zero</b>. Tipo <b>Privado</b>, nome <code>Checklist Rastreador - Raster</code>. O primeiro canal pode ter o mesmo nome.</div></li>
   </ol>
+  <figure class="estreita">
+    <div class="moldura"><img src="img/teams-criar-equipe.png" alt="Tela Criar uma equipe no Teams" style="width:210px"></div>
+    <figcaption><span class="tag print">Print</span>Criação da equipe no Teams.</figcaption>
+  </figure>
+  <ol class="passos" style="counter-reset:p 1">
+    <li><div>Adicione quem usa o painel: <b>⋯</b> ao lado do nome da equipe › <b>Adicionar membro</b>. Membros podem editar os arquivos, que é o que o painel precisa.</div></li>
+    <li><div>Quem também deve poder convidar e remover pessoas vira <b>Proprietário</b>, em <b>⋯ › Gerenciar equipe › Membros</b>. Assim ninguém depende de uma pessoa só para dar acesso.</div></li>
+    <li><div>No canal, abra a aba <b>Compartilhado</b> › <b>Abrir no SharePoint</b> e crie a pasta <code>Checklist Rastreador</code> em <b>+ Criar ou carregar</b> › <b>Pasta</b>.</div></li>
+  </ol>
+  <figure>
+    <div class="moldura" style="background:#fff"><img src="img/teams-aba-compartilhado.png" alt="Aba Compartilhado da equipe no Teams"></div>
+    <figcaption><span class="tag print">Print</span>A aba <b>Compartilhado</b> é onde ficam os arquivos do canal. No Teams antigo, ela se chama <b>Arquivos</b>.</figcaption>
+  </figure>
+  <ol class="passos" style="counter-reset:p 4">
+    <li><div>Sincronize essa pasta no seu computador (seção 2).</div></li>
+    <li><div>No Explorador de Arquivos, extraia dentro da pasta sincronizada o <code>checklist-rastreador.zip</code> e, só na primeira instalação, o <code>planilha-inicial.zip</code>, que traz os 87 veículos da planilha antiga. Extraia pelo Explorador: carregar o zip pelo navegador não extrai o conteúdo.</div></li>
+  </ol>
+  <p>No SharePoint, a pasta fica em <b>Documentos › Checklist Rastreador - Raster › Checklist Rastreador</b>. Se ela já existia no OneDrive de alguém, mova em vez de criar outra: no OneDrive pela web, selecione a pasta › <b>Mover para</b> › o site <b>Checklist Rastreador - Raster</b> › <b>Documentos</b> › o canal › <b>Mover aqui</b>. Depois cada pessoa sincroniza a pasta nova e usa <b>trocar pasta</b> no painel.</p>
   <h3>Como a pasta fica depois de extrair</h3>
   <table>
     <thead><tr><th>Item</th><th>O que é</th><th>Quem mexe</th></tr></thead>
@@ -185,28 +202,12 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
 
   <h3>Passo 2 · Adicione a pasta ao seu OneDrive</h3>
   <ol class="passos">
-    <li><div>No navegador, abra a pasta <code>Checklist Rastreador</code> no SharePoint (o link é enviado por quem administra).</div></li>
-    <li><div>Na barra de cima da pasta, clique em <b>Adicionar atalho ao Meu OneDrive</b>. Se essa opção não aparecer, clique em <b>Sincronizar</b> e aceite abrir o OneDrive quando o navegador perguntar.</div></li>
+    <li><div>No Teams, abra a equipe <b>Checklist Rastreador - Raster</b>, clique na aba <b>Compartilhado</b> e depois em <b>Abrir no SharePoint</b>.</div></li>
+    <li><div>Marque a linha <b>Checklist Rastreador</b> clicando no círculo à esquerda do nome. Depois clique em <b>Adicionar atalho ao OneDrive</b>, na barra de cima. Com a linha marcada, o atalho aponta só para essa pasta, e não para o canal inteiro. Se a opção não aparecer, use <b>⋯ › Sincronizar</b>.</div></li>
   </ol>
   <figure>
-    <div class="moldura" style="background:#fff">
-      <svg viewBox="0 0 700 170" role="img" aria-label="Barra de comandos da pasta no SharePoint">
-        <rect x="0" y="0" width="700" height="170" fill="#fff"/>
-        <rect x="0" y="0" width="700" height="34" fill="#F3F4F8"/><circle cx="18" cy="17" r="5" fill="#DCDEE8"/><circle cx="34" cy="17" r="5" fill="#DCDEE8"/><circle cx="50" cy="17" r="5" fill="#DCDEE8"/>
-        <rect x="76" y="8" width="420" height="18" rx="9" fill="#fff" stroke="#DCDEE8"/><text x="90" y="21" font-family="IBM Plex Mono,monospace" font-size="10.5" fill="#767B8D">sharepoint.com/sites/.../Checklist Rastreador</text>
-        <text x="20" y="66" font-family="Archivo,sans-serif" font-size="15" font-weight="700" fill="#1C2543">Documentos › Checklist Rastreador</text>
-        <g font-family="Archivo,sans-serif" font-size="12.5" fill="#363E58">
-          <text x="20" y="102">+ Novo</text><text x="86" y="102">↑ Carregar</text><text x="172" y="102">Compartilhar</text>
-          <rect x="266" y="84" width="104" height="28" rx="6" fill="#FBF1D9" stroke="#C99A2E" stroke-width="1.5"/><text x="280" y="102" font-weight="700" fill="#1C2543">⟳ Sincronizar</text>
-          <rect x="380" y="84" width="248" height="28" rx="6" fill="#E3F2EA" stroke="#1E8E5A" stroke-width="2"/><text x="394" y="102" font-weight="700" fill="#1C2543">⊕ Adicionar atalho ao Meu OneDrive</text>
-          <text x="642" y="102">…</text>
-        </g>
-        <line x1="20" y1="124" x2="680" y2="124" stroke="#DCDEE8"/>
-        <g font-family="Archivo,sans-serif" font-size="12" fill="#363E58"><text x="20" y="148">📄 painel.html</text><text x="170" y="148">📁 lib</text><text x="250" y="148">📁 eventos</text><text x="350" y="148">📁 checklists</text></g>
-        <text x="494" y="150" font-family="Archivo,sans-serif" font-size="11" font-weight="700" fill="#1E8E5A">← prefira este</text>
-      </svg>
-    </div>
-    <figcaption><span class="tag ilus">Ilustração</span>Barra de comandos da pasta no SharePoint. Em telas estreitas, os botões podem estar dentro do menu "…".</figcaption>
+    <div class="moldura" style="background:#fff"><img src="img/sharepoint-adicionar-atalho.png" alt="Pasta Checklist Rastreador no SharePoint com o botão Adicionar atalho ao OneDrive"></div>
+    <figcaption><span class="tag print">Print</span>Os destaques em vermelho mostram a linha a marcar e o botão a clicar.</figcaption>
   </figure>
 
   <h3>Passo 3 · Encontre a pasta no Explorador de Arquivos</h3>
@@ -259,7 +260,7 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
     <li><div>Abra o <code>painel.html</code> pelo atalho ou pela pasta sincronizada. Se abrir em outro navegador, clique com o botão direito no arquivo, escolha <b>Abrir com</b> e selecione Edge ou Chrome.</div></li>
     <li><div>Clique em <span class="btnx">Escolher pasta</span> e selecione a pasta <code>Checklist Rastreador</code> sincronizada, a mesma onde está o <code>painel.html</code>.</div></li>
   </ol>
-  <figure>
+  <figure class="menor">
     <div class="moldura"><img src="img/01-escolher-pasta.png" alt="Tela inicial do painel pedindo para escolher a pasta"></div>
     <figcaption><span class="tag print">Print</span>Tela que aparece na primeira vez que o painel abre no computador.</figcaption>
   </figure>
@@ -282,11 +283,11 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
   <ol class="passos" style="counter-reset:p 3">
     <li><div>Escolha seu nome na lista. Se ele não estiver lá, digite e clique em <span class="btnx">Entrar com esse nome</span>. Use sempre o mesmo nome: é ele que aparece no histórico de tudo o que você fizer.</div></li>
   </ol>
-  <figure>
+  <figure class="menor">
     <div class="moldura"><img src="img/02-nome.png" alt="Tela de escolha do nome"></div>
     <figcaption><span class="tag print">Print</span>Escolha do nome. Os nomes já cadastrados aparecem como botões.</figcaption>
   </figure>
-  <p>O navegador lembra a pasta e o nome. Em algumas aberturas ele mostra <b>Permitir acesso à pasta</b>: é só clicar para confirmar. Para trocar de usuário no mesmo computador, use a caixa <b>Você</b>, no canto de cima.</p>
+  <p>O navegador lembra a pasta e o nome. Em algumas aberturas ele mostra <b>Permitir acesso à pasta</b>: é só clicar para confirmar. Para trocar de usuário no mesmo computador, use a caixa <b>Você</b>, no canto de cima. Para apontar o painel para outra pasta, por exemplo depois que a pasta mudou de lugar, clique em <b>trocar pasta</b>, ao lado do nome da pasta.</p>
 </section>
 
 <!-- 4 -->
@@ -413,6 +414,7 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
       <figcaption><span class="tag print">Print</span>Pasta lida às 14:51; Ana Paula e Jader Moreira no painel.</figcaption>
     </figure>
   </div>
+  <p><b>Dar acesso a alguém novo:</b> um proprietário do time adiciona a pessoa como membro no Teams (<b>⋯ › Adicionar membro</b>). Depois a pessoa segue as seções 2 e 3 no computador dela.</p>
   <p>A aba <b>Pessoas</b> mostra quem usa o painel. Dá para adicionar e remover nomes; a remoção pede um segundo clique para confirmar.</p>
   <h3>Quando um colega mexe no mesmo veículo</h3>
   <ul>
@@ -420,7 +422,7 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
     <li><b>Aviso "acabou de alterar":</b> se um colega mexer no veículo enquanto você está com o detalhe aberto, o painel não grava sua ação e mostra a situação nova. Se ainda fizer sentido, repita a ação.</li>
     <li><b>Duas pessoas no mesmo minuto:</b> as duas alterações ficam no histórico, e vale a mais recente.</li>
   </ul>
-  <figure class="det">
+  <figure class="det det2">
     <div class="moldura"><img src="img/06-aviso-colega.png" alt="Detalhe do veículo com a faixa amarela de alteração recente de uma colega"></div>
     <figcaption><span class="tag print">Print</span>A Ana Paula colocou a QQV4574 em Manutenção e escreveu uma observação há 2 minutos.</figcaption>
   </figure>
@@ -434,9 +436,11 @@ figure.det figcaption{width:78%;margin-left:auto;margin-right:auto}
     <tbody>
       <tr><td>Aparece "Abra este painel no Microsoft Edge ou no Google Chrome"</td><td>O arquivo abriu em outro navegador. Botão direito em <code>painel.html</code> › <b>Abrir com</b> › Edge ou Chrome</td></tr>
       <tr><td>Aparece "Reconectar à pasta"</td><td>Clique em <b>Permitir acesso à pasta</b>. É o navegador pedindo confirmação; nada se perdeu</td></tr>
-      <tr><td>A fila abriu vazia, mas os colegas veem veículos</td><td>Você escolheu outra pasta. Use <b>Escolher outra pasta</b> e selecione a pasta sincronizada onde está o <code>painel.html</code></td></tr>
+      <tr><td>A fila abriu vazia, mas os colegas veem veículos</td><td>O painel está apontando para outra pasta. Clique em <b>trocar pasta</b> e selecione a pasta sincronizada do time</td></tr>
+      <tr><td>Aparece "Falha ao ler a pasta" no canto de cima</td><td>A pasta mudou de lugar ou deixou de ser sincronizada. Sincronize a pasta do time de novo (seção 2) e use <b>trocar pasta</b></td></tr>
       <tr><td>A alteração de um colega não aparece</td><td>Confira se a nuvem do OneDrive está azul, sem aviso, no seu computador e no dele. Espere um ou dois minutos</td></tr>
-      <tr><td>Aparece "Não foi possível salvar na pasta"</td><td>Sua conta não tem permissão de edição na pasta, ou o OneDrive está pausado. Peça acesso de edição a quem administra a pasta</td></tr>
+      <tr><td>Aparece "Não foi possível salvar na pasta"</td><td>Você não é membro do time, ou o OneDrive está pausado. Peça a um proprietário do time para adicionar você</td></tr>
+      <tr><td>Não consigo adicionar uma pessoa ao time</td><td>Só proprietários adicionam membros. Peça a um proprietário, ou peça para ser proprietário</td></tr>
       <tr><td>"Abrir PDF" diz que não encontrou o arquivo</td><td>O PDF ainda está sincronizando. Tente de novo em instantes</td></tr>
       <tr><td>Apareceu um arquivo com nome de computador, como <code>2210098-PC01.pdf</code></td><td>Duas pessoas importaram o mesmo PDF ao mesmo tempo e o OneDrive criou uma cópia. Pode apagar a cópia; o checklist conta uma vez só</td></tr>
       <tr><td>Escolhi o nome errado</td><td>Troque na caixa <b>Você</b>, no canto de cima. O que já foi feito continua com o nome anterior</td></tr>
