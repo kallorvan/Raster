@@ -11,7 +11,7 @@ Gerenciadora de risco que testa o rastreador do veículo e emite o checklist.
 _Evitar_: portal, gerenciadora
 
 **Checklist**:
-Teste do rastreador de um veículo e suas carretas, emitido pela Raster em PDF, com um resultado e um vencimento. Um veículo pode ter vários; vale o mais recente.
+Teste do rastreador de um veículo, emitido pela Raster em PDF, com um resultado e um vencimento. Vale para o veículo até o vencimento, mesmo que ele troque de carreta. Um veículo pode ter vários; vale o mais recente.
 _Evitar_: check list, teste do rastreador, PDF
 
 **Resultado**:
@@ -29,7 +29,7 @@ Caminhão identificado pela placa, que é a unidade da fila.
 _Evitar_: cavalo, placa, caminhão
 
 **Carreta**:
-Implemento engatado ao veículo no momento do checklist (Carreta 01, 02, 03).
+Implemento engatado ao veículo, registrado no checklist (Carreta 01, 02, 03). Trocar de carreta não exige novo checklist.
 _Evitar_: reboque
 
 ### Fila
