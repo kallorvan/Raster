@@ -19,4 +19,5 @@
 - Alterações de colegas aparecem quando o OneDrive sincroniza, normalmente em segundos a poucos minutos. O painel relê a pasta a cada 20 segundos e sempre que você volta para a janela dele.
 - "No painel agora" mostra quem deu sinal nos últimos 3 minutos.
 - Os PDFs importados ficam em `checklists/<placa>/<código>.pdf`.
+- PDFs salvos em `entrada/` são importados sozinhos por qualquer painel aberto (depois de 15 segundos, para dar tempo de sincronizar). O arquivo sai da `entrada/`; o que não for checklist da Raster vai para `entrada/com-erro/`.
 - Para testar sem mexer na pasta real, sirva o painel por `http://localhost` e abra `painel.html?demo=1`: os dados ficam só naquele navegador.

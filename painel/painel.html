@@ -292,7 +292,7 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
       <div class="sec-h"><h2>Importar checklists da Raster</h2><span class="sec-note">Um ou vários PDFs de uma vez</span></div>
       <label class="drop" id="drop">
         <span class="big">Arraste os PDFs do checklist para cá</span>
-        <span class="small">Baixe o PDF em "Geração Aprovação/Reprovação do CheckList" no portal da Raster. O painel lê placa, carretas, resultado, data do teste e vencimento, e guarda uma cópia do PDF na pasta. Checklists já importados são ignorados.</span>
+        <span class="small">Baixe o PDF em "Geração Aprovação/Reprovação do CheckList" no portal da Raster. O painel lê placa, carretas, resultado, data do teste e vencimento, e guarda uma cópia do PDF na pasta. Checklists já importados são ignorados. Outra opção: salve os PDFs na pasta <b>entrada</b>, dentro da pasta do time, e o painel importa sozinho.</span>
         <span class="btn" style="margin-top:6px">Escolher arquivos</span>
         <input type="file" id="arq" accept="application/pdf,.pdf" multiple hidden>
       </label>
@@ -447,7 +447,7 @@ async function conectado() {
   $('#gate').hidden = true;
   await recarregar();
   timers.forEach(clearInterval);
-  timers = [setInterval(recarregar, 20000), setInterval(presenca, 60000)];
+  timers = [setInterval(async () => { await recarregar(); verificarEntrada(); }, 20000), setInterval(presenca, 60000)];
   entrarOuPerguntar();
 }
 
@@ -571,6 +571,7 @@ function mostrarApp() {
   trocarAba(lsGet('raster.aba') || 'fila');
   presenca();
   render();
+  verificarEntrada();
 }
 
 /* ---------- abas ---------- */
@@ -716,7 +717,7 @@ function descreverEvento(e) {
   const d = e.dados || {};
   switch (e.tipo) {
     case 'veiculo_cadastrado': return `Trazido da planilha antiga · ${esc(NOME_SIT[d.situacao] || d.situacao)} · vencimento ${fmtData(d.vencimento)}`;
-    case 'checklist_importado': return `Checklist <span class="num">${esc(d.codigo)}</span> importado · <span class="st ${d.resultado}">${NOME_RES[d.resultado]}</span>${d.vencimento ? ' · vence ' + fmtData(d.vencimento) : ''}`;
+    case 'checklist_importado': return `Checklist <span class="num">${esc(d.codigo)}</span> importado${d.origem === 'entrada' ? ' da pasta de entrada' : ''} · <span class="st ${d.resultado}">${NOME_RES[d.resultado]}</span>${d.vencimento ? ' · vence ' + fmtData(d.vencimento) : ''}`;
     case 'validado': return 'Validado e lançado no Rodopar';
     case 'situacao_definida': return d.situacao ? `Situação definida: <span class="st ${d.situacao}">${esc(NOME_SIT[d.situacao])}</span>` : 'Situação voltou a ser calculada pelo checklist';
     case 'observacao': return d.texto ? `Observação: "${esc(d.texto)}"` : 'Observação apagada';
@@ -846,6 +847,35 @@ async function abrirPdf(caminho) {
 }
 
 /* ---------- importar ---------- */
+// Lê um PDF, confere duplicado pelo código da Raster, guarda a cópia e grava o evento.
+async function processarPdf(nome, buf, origem) {
+  const r = { nome };
+  try {
+    let tc;
+    try {
+      const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf.slice(0)) }).promise;
+      tc = await (await doc.getPage(1)).getTextContent();
+      doc.destroy();
+    } catch { throw new Error('O arquivo não é um PDF válido ou está corrompido.'); }
+    const ck = C.lerChecklist(C.linhasDoPdf(tc.items));
+    const ja = st.estado.codigos.get(ck.codigo);
+    if (ja) return Object.assign(r, { tipo: 'dup', placa: ck.placa, msg: `Checklist ${ck.codigo} já importado por ${ja.pessoa} em ${fmtDataHora(ja.ts)}.` });
+    const pasta = await dir(ck.placa, await dir('checklists'));
+    await escrever(pasta, `${ck.codigo}.pdf`, buf);
+    await gravar('checklist_importado', ck.placa, { ...ck, arquivo: `checklists/${ck.placa}/${ck.codigo}.pdf`, nomeOriginal: nome, ...(origem ? { origem } : {}) });
+    return Object.assign(r, { tipo: 'ok', placa: ck.placa, ck, msg: ck.resultado === 'aprovado' ? `Aprovado · vence ${fmtDataHora(ck.vencimento)} → Checklist feito – confirmar validação` : 'Reprovado → Necessário realizar checklist' });
+  } catch (e) { return Object.assign(r, { tipo: 'err', msg: e.message }); }
+}
+
+const ROT_RES = { ok: ['validado', 'Importado'], dup: ['manutencao', 'Já importado'], err: ['necessario', 'Erro'] };
+function mostrarResultados(out, titulo) {
+  const box = $('#res'); box.hidden = false;
+  box.innerHTML = (titulo ? `<div class="res"><span class="sec-note" style="grid-column:1/-1">${esc(titulo)}</span></div>` : '') +
+    out.map(r => `<div class="res"><span class="st ${ROT_RES[r.tipo][0]}">${ROT_RES[r.tipo][1]}</span>
+      <span>${r.placa ? `<button class="linkbtn nm" type="button" data-abrir="${esc(r.placa)}">${esc(r.placa)}</button> · ` : ''}${esc(r.msg)}</span>
+      <span class="f">${esc(r.nome)}</span></div>`).join('');
+}
+
 async function importar(arquivos) {
   if (!st.pessoa || !arquivos.length) return;
   trocarAba('imp');
@@ -854,29 +884,52 @@ async function importar(arquivos) {
   await recarregar(); // pega importações recentes de colegas antes de checar duplicados
   const out = [];
   for (const f of arquivos) {
-    const r = { nome: f.name };
-    try {
-      if (!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf') throw new Error('Não é um arquivo PDF.');
-      const buf = await f.arrayBuffer();
-      const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf.slice(0)) }).promise;
-      const tc = await (await doc.getPage(1)).getTextContent();
-      doc.destroy();
-      const ck = C.lerChecklist(C.linhasDoPdf(tc.items));
-      const ja = st.estado.codigos.get(ck.codigo);
-      if (ja) { Object.assign(r, { tipo: 'dup', placa: ck.placa, msg: `Checklist ${ck.codigo} já importado por ${ja.pessoa} em ${fmtDataHora(ja.ts)}.` }); out.push(r); continue; }
-      const pasta = await dir(ck.placa, await dir('checklists'));
-      await escrever(pasta, `${ck.codigo}.pdf`, buf);
-      await gravar('checklist_importado', ck.placa, { ...ck, arquivo: `checklists/${ck.placa}/${ck.codigo}.pdf`, nomeOriginal: f.name });
-      Object.assign(r, { tipo: 'ok', placa: ck.placa, ck, msg: ck.resultado === 'aprovado' ? `Aprovado · vence ${fmtDataHora(ck.vencimento)} → Checklist feito – confirmar validação` : 'Reprovado → Necessário realizar checklist' });
-    } catch (e) { Object.assign(r, { tipo: 'err', msg: e.message }); }
-    out.push(r);
+    if (!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf') { out.push({ nome: f.name, tipo: 'err', msg: 'Não é um arquivo PDF.' }); continue; }
+    out.push(await processarPdf(f.name, await f.arrayBuffer()));
   }
-  const rot = { ok: ['validado', 'Importado'], dup: ['manutencao', 'Já importado'], err: ['necessario', 'Erro'] };
-  box.innerHTML = out.map(r => `<div class="res"><span class="st ${rot[r.tipo][0]}">${rot[r.tipo][1]}</span>
-      <span>${r.placa ? `<button class="linkbtn nm" type="button" data-abrir="${esc(r.placa)}">${esc(r.placa)}</button> · ` : ''}${esc(r.msg)}</span>
-      <span class="f">${esc(r.nome)}</span></div>`).join('');
+  mostrarResultados(out);
   const ok = out.filter(r => r.tipo === 'ok').length;
   aviso(`${ok} de ${out.length} checklist(s) importado(s).`, ok === out.length ? 'ok' : 'info');
+}
+
+// Pasta entrada/: PDFs salvos ali são importados sozinhos por qualquer painel aberto.
+// Importado ou já importado: sai da entrada (a cópia fica em checklists/). Erro: vai para entrada/com-erro/.
+const ENTRADA_IDADE_MIN = 15000; // espera o arquivo terminar de sincronizar antes de ler
+async function verificarEntrada() {
+  if (!st.root || !st.pessoa || st.verificandoEntrada || $('#tabs').hidden) return;
+  st.verificandoEntrada = true;
+  try {
+    const entrada = await dir('entrada');
+    const novos = [];
+    for await (const [nome, h] of entrada.entries()) {
+      if (h.kind !== 'file' || !/\.pdf$/i.test(nome)) continue;
+      const f = await h.getFile();
+      if (f.size > 0 && Date.now() - f.lastModified >= ENTRADA_IDADE_MIN) novos.push([nome, f]);
+    }
+    if (!novos.length) return;
+    await recarregar();
+    const out = [];
+    for (const [nome, f] of novos) {
+      const buf = await f.arrayBuffer();
+      const r = await processarPdf(nome, buf, 'entrada');
+      try {
+        if (r.tipo === 'err') {
+          const erros = await dir('com-erro', entrada);
+          let destino = nome;
+          try { await erros.getFileHandle(destino); destino = `${Date.now()}_${nome}`; } catch {}
+          await escrever(erros, destino, buf);
+          r.msg += ' Movido para entrada/com-erro/.';
+        }
+        await entrada.removeEntry(nome);
+      } catch { /* outro painel já tirou o arquivo da entrada */ }
+      out.push(r);
+    }
+    const ok = out.filter(r => r.tipo === 'ok').length, err = out.filter(r => r.tipo === 'err').length;
+    mostrarResultados(out, `Pasta de entrada · ${fmtDataHora(new Date().toISOString())}`);
+    if (ok || err) aviso(`${ok} checklist(s) importado(s) da pasta de entrada${err ? ` · ${err} com erro, em entrada/com-erro/` : ''}.`, err ? 'info' : 'ok');
+  } catch (e) {
+    aviso('Não foi possível ler a pasta de entrada: ' + e.message, 'err');
+  } finally { st.verificandoEntrada = false; }
 }
 $('#res').addEventListener('click', e => { const b = e.target.closest('[data-abrir]'); if (b) abrir(b.dataset.abrir); });
 $('#arq').addEventListener('change', e => { importar([...e.target.files]); e.target.value = ''; });
@@ -935,7 +988,7 @@ function aviso(txt, tipo) {
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { recarregar(); presenca(); } });
 
-window.__painel = { st, gravar, recarregar, importar }; // usado nos testes automatizados
+window.__painel = { st, gravar, recarregar, importar, verificarEntrada }; // usado nos testes automatizados
 iniciar();
 })();
 </script>
