@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Post · Checklist do Rastreador</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1C2543;--coral:#DD4663;--sand:#F4D38D;--mauve:#AE82B1;--muted:#6B7088;--line:#ECE6F0;--chip:#F7F2F8}
+*{box-sizing:border-box;margin:0}
+body{width:1080px;height:1920px;overflow:hidden;font-family:Inter,'Archivo',sans-serif;background:#fff;color:var(--ink);position:relative}
+.topo{background:var(--ink);height:860px;padding:72px 70px 0;position:relative}
+.marcas{display:flex;gap:46px;align-items:center}
+.marcas img{height:72px}
+.pill{display:inline-block;margin-top:92px;background:var(--coral);color:#fff;font:700 25px Inter;letter-spacing:.02em;padding:13px 26px;border-radius:999px}
+h1{font-family:Archivo;font-weight:800;font-size:92px;line-height:.97;color:#fff;letter-spacing:-.02em;margin-top:38px;font-variation-settings:'wdth' 100}
+.sub{color:var(--sand);font:600 33px/1.32 Inter;margin-top:30px;max-width:640px}
+.mini{color:#fff;opacity:.92;font:400 24px Inter;position:absolute;left:73px;top:806px}
+.fitas{position:absolute;right:0;top:0;width:1080px;height:960px;overflow:hidden;pointer-events:none}
+.fitas div{position:absolute;width:330px;height:900px;border-radius:80px 0 0 0;transform:skewY(-33deg);transform-origin:top left}
+.fitas .f1{background:var(--coral);left:775px;top:640px;height:178px!important}
+.fitas .f2{background:var(--sand);left:820px;top:705px;height:158px!important}
+.fitas .f3{background:var(--mauve);left:865px;top:770px;height:140px!important}
+.passos{padding:34px 60px 0 80px;position:relative;z-index:2}
+.passo{display:grid;grid-template-columns:80px 1fr;gap:42px;margin-bottom:28px;position:relative}
+.passo::before{content:"";position:absolute;left:39px;top:80px;bottom:-30px;width:3px;background:var(--line)}
+.passo:last-child::before{display:none}
+.num{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;font:700 34px Inter;color:#fff;z-index:1}
+.n1{background:var(--coral)} .n2{background:var(--sand);color:var(--ink)} .n3{background:var(--mauve)} .n4{background:var(--ink)}
+.passo h2{font-family:Archivo;font-weight:700;font-size:40px;letter-spacing:-.01em;margin-top:8px;font-variation-settings:'wdth' 100}
+.passo p{font:400 25px/1.45 Inter;color:var(--muted);margin-top:10px}
+.passo p b{color:var(--ink);font-weight:600}
+.aviso{margin:6px 60px 0;background:var(--ink);border-radius:22px;border-left:16px solid var(--coral);padding:22px 30px;text-align:center}
+.aviso .t{color:var(--sand);font:700 30px Inter}
+.aviso .d{color:#fff;font:400 27px Inter;margin-top:6px}
+.muda{padding:30px 60px 0}
+.muda h3{font:700 27px Inter}
+.chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:18px}
+.chips span{border:2px solid var(--line);background:var(--chip);border-radius:999px;padding:12px 22px;font:500 24px Inter}
+.rodape{position:absolute;left:0;right:0;bottom:0;height:20px;background:linear-gradient(var(--coral) 0 34%,var(--sand) 34% 67%,var(--mauve) 67% 100%)}
+</style></head>
+<body>
+<div class="topo">
+  <div class="marcas"><img src="logo-toliman-branco.png" alt="Tóliman Transportes"><img src="logo-dinamo-branco.png" alt="Grupo Dínamo"></div>
+  <span class="pill">BOAS-VINDAS</span>
+  <h1>A planilha do checklist virou painel!</h1>
+  <p class="sub">O Checklist do Rastreador nasceu na equipe do Teams “Checklist Rastreador - Raster” e todos veem a mesma fila.</p>
+  <p class="mini">Sem acesso à equipe? Peça para ser adicionado.</p>
+  <div class="fitas"><div class="f1"></div><div class="f2"></div><div class="f3"></div></div>
+</div>
+
+<div class="passos">
+  <div class="passo"><div class="num n1">1</div><div><h2>Crie o atalho (só na 1ª vez)</h2><p>No Teams: equipe <b>Checklist Rastreador - Raster</b> › Compartilhado › marque a pasta <b>Checklist Rastreador</b> › Adicionar atalho ao OneDrive.</p></div></div>
+  <div class="passo"><div class="num n2">2</div><div><h2>Abra no navegador</h2><p>No Explorador: OneDrive › Checklist Rastreador › botão direito no <b>painel.html</b> › Abrir com › Chrome/Edge.</p></div></div>
+  <div class="passo"><div class="num n3">3</div><div><h2>Conecte a pasta (só na 1ª vez)</h2><p><b>Escolher pasta</b> › selecione a pasta Checklist Rastreador › escolha seu nome na lista.</p></div></div>
+  <div class="passo"><div class="num n4">4</div><div><h2>Deixe sempre disponível</h2><p>Botão direito na pasta › Sempre manter neste dispositivo: abre mais rápido e funciona offline.</p></div></div>
+</div>
+
+<div class="aviso"><div class="t">Seu nome não aparece na lista?</div><div class="d">Peça ao administrador do painel para cadastrar.</div></div>
+
+<div class="muda">
+  <h3>O que muda</h3>
+  <div class="chips"><span>Adeus, planilha manual</span><span>Lê o PDF da Raster sozinho</span><span>Fila por vencimento</span><span>Veja quem está online</span><span>Histórico de tudo</span></div>
+</div>
+<div class="rodape"></div>
+</body></html>
