@@ -1,8 +1,10 @@
-// node --test tests/
+// node --test tests/*.test.cjs
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const C = require('../painel/lib/checklist.js');
 const linhasAprovado = require('./fixtures/checklist-aprovado-UVR1I58.json');
+const linhasQPE = require('./fixtures/checklist-aprovado-QPE7756.json');
+const linhasLayoutChecklist = require('./fixtures/checklist-aprovado-QQS9985.json');
 
 const AGORA = new Date('2026-10-15T10:00:00');
 let seq = 0;
@@ -32,8 +34,50 @@ test('lê um checklist reprovado sem expiração', () => {
   assert.equal(ck.vencimento, null);
 });
 
+test('lê outro PDF do mesmo layout (QPE7756)', () => {
+  const ck = C.lerChecklist(linhasQPE);
+  assert.equal(ck.layout, 'dados-do-teste');
+  assert.equal(ck.codigo, '2210689');
+  assert.equal(ck.placa, 'QPE7756');
+  assert.equal(ck.dataTeste, '2026-10-15T12:39:26');
+  assert.equal(ck.vencimento, '2026-11-14T12:39:26');
+  assert.deepEqual(ck.carretas, ['GBL9B63', 'GDJ7F84']);
+});
+
+test('lê o layout "DADOS DO CHECKLIST" (QQS9985)', () => {
+  const ck = C.lerChecklist(linhasLayoutChecklist);
+  assert.equal(ck.layout, 'dados-do-checklist');
+  assert.equal(ck.codigo, '94774');
+  assert.equal(ck.placa, 'QQS9985');
+  assert.equal(ck.resultado, 'aprovado');
+  assert.equal(ck.dataTeste, '2026-10-27T10:04:54');
+  assert.equal(ck.vencimento, '2026-11-26T10:52:30');
+  assert.deepEqual(ck.carretas, ['FTL5079', 'FSN7280']);
+  assert.equal(ck.perfil, 'REGRA TOLIMAN – BITREM CARREGADO - SWISS RE');
+  assert.equal(ck.tecnologia, 'SASCAR / SASMDT - HIBRIDO');
+});
+
+test('layout "DADOS DO CHECKLIST" reprovado sem data de expiração', () => {
+  const linhas = linhasLayoutChecklist
+    .map(l => (l === 'APROVADO' ? 'REPROVADO' : l))
+    .map(l => l.replace(/ ¦ Data expiração: ¦ [^¦]+$/, ' ¦ Data expiração:'));
+  const ck = C.lerChecklist(linhas);
+  assert.equal(ck.resultado, 'reprovado');
+  assert.equal(ck.vencimento, null);
+});
+
+test('layout desconhecido: erro traz o texto e o que foi lido, para preencher à mão', () => {
+  const linhas = ['RELATÓRIO DE RASTREADOR', 'Veículo: ABC-1D23', 'APROVADO']; // rótulo e valor no mesmo pedaço de texto
+  try { C.lerChecklist(linhas); assert.fail('deveria recusar'); } catch (e) {
+    assert.match(e.message, /Não reconheci o layout/);
+    assert.deepEqual(e.linhas, linhas);
+    assert.equal(e.parcial.placa, 'ABC1D23');
+    assert.equal(e.parcial.resultado, 'aprovado');
+  }
+});
+
 test('recusa arquivo que não é checklist', () => {
-  assert.throws(() => C.lerChecklist(['NOTA FISCAL', 'Total: R$ 10']), /não parece ser um checklist/);
+  assert.throws(() => C.lerChecklist(['NOTA FISCAL', 'Total: R$ 10']), /Não reconheci o layout/);
 });
 
 test('normaliza placa do portal e da planilha', () => {
@@ -105,6 +149,14 @@ test('código duplicado gravado por dois PCs conta uma vez', () => {
     importado('AAA1A11', '7', 'aprovado', '2026-10-15T08:00:00', '2026-11-14T08:00:00'),
   ];
   assert.equal(estado(evs).veiculos[0].checklists.length, 1);
+});
+
+test('mesmo código em placas diferentes (numerações dos layouts) conta para cada uma', () => {
+  const evs = [
+    importado('AAA1A11', '94774', 'aprovado', '2026-10-15T08:00:00', '2026-11-14T08:00:00'),
+    importado('BBB2B22', '94774', 'aprovado', '2026-10-15T08:00:00', '2026-11-14T08:00:00'),
+  ];
+  assert.deepEqual(estado(evs).veiculos.map(v => v.checklists.length), [1, 1]);
 });
 
 test('veículo da planilha mantém a situação de origem', () => {

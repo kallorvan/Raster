@@ -40,51 +40,74 @@
       .map(y => rows.get(y).sort((a, b) => a[0] - b[0]).map(r => r[1]).join(' ¦ '));
   }
 
-  // Extrai os campos do checklist a partir das linhas. Lança erro se não for um checklist Raster.
+  // Layouts do PDF que o portal da Raster gera. Cada um é reconhecido pelo título do primeiro bloco.
+  const LAYOUTS = [
+    { id: 'dados-do-teste', marca: /^DADOS DO TESTE$/im },         // ex.: UVR1I58, QPE7756
+    { id: 'dados-do-checklist', marca: /^DADOS DO CHECKLIST$/im }, // ex.: QQS9985 (código com outra numeração)
+  ];
+  // Rótulos de cada campo nos layouts conhecidos (maiúsculas/minúsculas não importam).
+  // "Expiração:" também acha "Data expiração:".
+  const ROTULOS = {
+    codigo: ['Código:'],
+    placa: ['Veículo:'],
+    dataTeste: ['Data Teste:'],
+    vencimento: ['Expiração:'],
+    perfil: ['Perfil Segurança:', 'Perfil de segurança:'],
+    tecnologia: ['Tecnologia:'],
+    solicitante: ['Solicitante:'],
+    tipo: ['Tipo:'],
+  };
+
+  // Extrai os campos do checklist a partir das linhas.
+  // Se não conseguir, lança um erro com .linhas (o texto lido) e .parcial (os campos que achou),
+  // para o painel oferecer o preenchimento à mão.
   function lerChecklist(linhas) {
     const texto = linhas.join('\n');
-    if (!/CHECKLIST/i.test(texto) || !/DADOS DO TESTE/i.test(texto)) {
-      throw new Error('O arquivo não parece ser um checklist da Raster.');
-    }
-    // valor = pedaço logo após o rótulo, desde que não seja outro rótulo
-    const campo = (rotulo) => {
-      const re = new RegExp(rotulo + '\\s*¦\\s*([^¦\\n]+)');
-      const m = re.exec(texto);
-      if (!m) return null;
-      const v = m[1].trim();
-      return /:$/.test(v) ? null : v;
+    // valor = pedaço logo após o rótulo (na mesma linha ou no começo da seguinte), desde que não seja outro rótulo
+    const campo = (rotulos) => {
+      for (const rotulo of [].concat(rotulos)) {
+        const m = new RegExp(rotulo + '[ \\t]*(?:¦[ \\t]*|\\n)?([^¦\\n]+)', 'iu').exec(texto);
+        if (!m) continue;
+        const v = m[1].trim();
+        if (v && !/:$/.test(v)) return v;
+      }
+      return null;
     };
+    const layout = LAYOUTS.find(l => /CHECKLIST/i.test(texto) && l.marca.test(texto));
     const resultado = linhas.map(l => l.trim()).find(l => /^(APROVADO|REPROVADO)$/i.test(l));
-    const codigo = campo('Código:');
-    const placa = normalizarPlaca(campo('Veículo:'));
-    const vencimento = dataBR(campo('Expiração:'));
-    const dataTeste = dataBR(campo('Data Teste:'));
-    const faltando = [];
-    if (!codigo) faltando.push('código');
-    if (!placa) faltando.push('placa do veículo');
-    if (!resultado) faltando.push('resultado');
-    if (!dataTeste) faltando.push('data do teste');
-    if (resultado && /^APROVADO$/i.test(resultado) && !vencimento) faltando.push('expiração');
-    if (faltando.length) throw new Error('Não encontrei no PDF: ' + faltando.join(', ') + '.');
-
     const carretas = [];
     for (const n of ['01', '02', '03']) {
       const c = campo(`Carreta ${n}:`);
       if (c) carretas.push(normalizarPlaca(c));
     }
-    return {
-      codigo,
-      placa,
-      resultado: resultado.toUpperCase() === 'APROVADO' ? 'aprovado' : 'reprovado',
-      dataTeste,
-      vencimento,
+    const ck = {
+      layout: layout ? layout.id : null,
+      codigo: campo(ROTULOS.codigo),
+      placa: normalizarPlaca(campo(ROTULOS.placa)),
+      resultado: resultado ? (resultado.toUpperCase() === 'APROVADO' ? 'aprovado' : 'reprovado') : null,
+      dataTeste: dataBR(campo(ROTULOS.dataTeste)),
+      vencimento: dataBR(campo(ROTULOS.vencimento)),
       carretas,
-      perfil: campo('Perfil Segurança:'),
-      tecnologia: campo('Tecnologia:'),
-      solicitante: campo('Solicitante:'),
-      tipo: campo('Tipo:'),
+      perfil: campo(ROTULOS.perfil),
+      tecnologia: campo(ROTULOS.tecnologia),
+      solicitante: campo(ROTULOS.solicitante),
+      tipo: campo(ROTULOS.tipo),
     };
+    const falha = (msg) => Object.assign(new Error(msg), { linhas, parcial: ck });
+    if (!layout) throw falha('Não reconheci o layout deste PDF.');
+    const faltando = [];
+    if (!ck.codigo) faltando.push('código');
+    if (!ck.placa) faltando.push('placa do veículo');
+    if (!ck.resultado) faltando.push('resultado');
+    if (!ck.dataTeste) faltando.push('data do teste');
+    if (ck.resultado === 'aprovado' && !ck.vencimento) faltando.push('expiração');
+    if (faltando.length) throw falha('Não encontrei no PDF: ' + faltando.join(', ') + '.');
+    return ck;
   }
+
+  // Identifica um checklist sem ambiguidade: os layouts usam numerações de código diferentes,
+  // então o mesmo número pode aparecer em placas diferentes.
+  const chaveChecklist = (ck) => `${ck.placa}#${ck.codigo}`;
 
   function diasAte(iso, agora) {
     if (!iso) return null;
@@ -99,7 +122,7 @@
     const ord = [...eventos].sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : (a.id < b.id ? -1 : 1)));
     const veiculos = new Map();
     const pessoas = new Map();
-    const codigos = new Map(); // código Raster -> evento de importação
+    const codigos = new Map(); // chaveChecklist (placa#código) -> evento de importação
     let admin = null; // senha do administrador (só ele cadastra e remove pessoas)
     const vei = (placa) => {
       if (!veiculos.has(placa)) {
@@ -131,9 +154,10 @@
           break;
         }
         case 'checklist_importado': {
-          if (codigos.has(e.dados.codigo)) break; // duplicado gravado por dois PCs ao mesmo tempo
+          const chave = chaveChecklist({ placa: e.placa, codigo: e.dados.codigo });
+          if (codigos.has(chave)) break; // duplicado gravado por dois PCs ao mesmo tempo
           const ck = { ...e.dados, origem: 'pdf', importadoEm: e.ts, importadoPor: e.pessoa, arquivo: e.dados.arquivo };
-          codigos.set(ck.codigo, e);
+          codigos.set(chave, e);
           v.checklists.push(ck);
           // vale o checklist mais recente pela data do teste
           if (!v.atual || !v.atual.dataTeste || (ck.dataTeste || '') >= v.atual.dataTeste) {
@@ -190,7 +214,7 @@
       a.placa.localeCompare(b.placa));
   }
 
-  const api = { ANTECEDENCIA_DIAS, SITUACOES, normalizarPlaca, dataBR, linhasDoPdf, lerChecklist, montarEstado, ordenarFila };
+  const api = { ANTECEDENCIA_DIAS, SITUACOES, LAYOUTS, normalizarPlaca, dataBR, linhasDoPdf, lerChecklist, chaveChecklist, montarEstado, ordenarFila };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Checklist = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -20,4 +20,5 @@
 - "No painel agora" mostra quem deu sinal nos últimos 3 minutos.
 - Os PDFs importados ficam em `checklists/<placa>/<código>.pdf`.
 - PDFs salvos em `entrada/` são importados sozinhos por qualquer painel aberto (depois de 15 segundos, para dar tempo de sincronizar). O arquivo sai da `entrada/`; o que não for checklist da Raster vai para `entrada/com-erro/`.
+- O painel lê os dois layouts de PDF que o portal da Raster gera hoje ("DADOS DO TESTE" e "DADOS DO CHECKLIST"). Se chegar um PDF que ele não reconhece, aparece **Preencher à mão**: o PDF abre ao lado de um formulário com o que deu para ler. O texto do PDF fica guardado no registro, para ensinar o layout novo ao painel depois.
 - Para testar sem mexer na pasta real, sirva o painel por `http://localhost` e abra `painel.html?demo=1`: os dados ficam só naquele navegador.

@@ -172,8 +172,14 @@ body.dragging .drop{border-color:var(--coral)}
 .addrow input{min-width:220px}
 
 /* detalhe do veículo */
-dialog#det{border:0;padding:0;border-radius:14px;width:min(820px,calc(100vw - 24px));max-height:calc(100vh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 24px 60px rgba(28,37,67,.35)}
-dialog#det::backdrop{background:rgba(28,37,67,.45)}
+dialog#det,dialog#man{border:0;padding:0;border-radius:14px;width:min(820px,calc(100vw - 24px));max-height:calc(100vh - 32px);background:var(--paper);color:var(--ink);box-shadow:0 24px 60px rgba(28,37,67,.35)}
+dialog#man{width:min(1100px,calc(100vw - 24px))}
+dialog#det::backdrop,dialog#man::backdrop{background:rgba(28,37,67,.45)}
+.man-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);gap:14px}
+.man-grid iframe{width:100%;height:min(68vh,760px);border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.man-form{display:grid;gap:12px;align-content:start}
+.man-form .inp{width:100%}
+.man-form .req::after{content:" *";color:var(--sus)}
 .det-in{padding:16px;display:grid;gap:14px}
 .hero{background:var(--ink);color:#fff;border-radius:var(--r);padding:20px 22px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;right:-46px;top:-30px;width:190px;height:190px;transform:skewX(-11deg);background:linear-gradient(180deg,var(--coral) 0 33.3%,var(--mauve) 33.3% 66.6%,var(--sand) 66.6% 100%);opacity:.13;pointer-events:none}
@@ -206,7 +212,8 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
   .wrap{padding-inline:16px} .top-in{padding:16px 16px 0} nav.tabs{padding:14px 16px 0}
   .side{align-items:flex-start} .sync,.pres{justify-content:flex-start;text-align:left}
   .brand img{height:32px}
-  .two{grid-template-columns:1fr}
+  .two,.man-grid{grid-template-columns:1fr}
+  .man-grid iframe{height:50vh}
   .tl{grid-template-columns:1fr;gap:4px} .tl .acc{text-align:left}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -328,6 +335,7 @@ footer{margin-top:34px;font-size:11px;color:var(--muted);line-height:1.6;border-
 </main>
 
 <dialog id="det" aria-labelledby="det-placa"></dialog>
+<dialog id="man" aria-labelledby="man-tit"></dialog>
 <div id="toast" class="msg" role="status" hidden></div>
 
 <script>
@@ -351,6 +359,7 @@ const st = {
   root: null, pendente: null,
   arquivos: new Map(),           // nome do arquivo de evento -> evento
   estado: { veiculos: [], pessoas: [], codigos: new Map() },
+  manuais: new Map(), seqManual: 0, // PDFs de layout não reconhecido esperando preenchimento à mão (só nesta sessão)
   pessoa: lsGet('raster.pessoa'),
   pc: lsGet('raster.pc') || (() => { const id = novoId(); lsSet('raster.pc', id); return id; })(),
   filtro: null, busca: '', desativados: false,
@@ -717,7 +726,7 @@ function descreverEvento(e) {
   const d = e.dados || {};
   switch (e.tipo) {
     case 'veiculo_cadastrado': return `Trazido da planilha antiga · ${esc(NOME_SIT[d.situacao] || d.situacao)} · vencimento ${fmtData(d.vencimento)}`;
-    case 'checklist_importado': return `Checklist <span class="num">${esc(d.codigo)}</span> importado${d.origem === 'entrada' ? ' da pasta de entrada' : ''} · <span class="st ${d.resultado}">${NOME_RES[d.resultado]}</span>${d.vencimento ? ' · vence ' + fmtData(d.vencimento) : ''}`;
+    case 'checklist_importado': return `Checklist <span class="num">${esc(d.codigo)}</span> importado${d.origem === 'entrada' ? ' da pasta de entrada' : ''}${d.lidoAMao ? ' · preenchido à mão' : ''} · <span class="st ${d.resultado}">${NOME_RES[d.resultado]}</span>${d.vencimento ? ' · vence ' + fmtData(d.vencimento) : ''}`;
     case 'validado': return 'Validado e lançado no Rodopar';
     case 'situacao_definida': return d.situacao ? `Situação definida: <span class="st ${d.situacao}">${esc(NOME_SIT[d.situacao])}</span>` : 'Situação voltou a ser calculada pelo checklist';
     case 'observacao': return d.texto ? `Observação: "${esc(d.texto)}"` : 'Observação apagada';
@@ -780,6 +789,7 @@ function renderDetalhe() {
           <dt>Carretas</dt><dd class="num">${esc((ck.carretas || []).join(' · ')) || '—'}</dd>
           <dt>Perfil</dt><dd>${esc(ck.perfil || '—')}</dd>
           <dt>Tecnologia</dt><dd>${esc(ck.tecnologia || '—')}</dd>
+          ${ck.lidoAMao ? '<dt>Leitura</dt><dd>Preenchido à mão (layout não reconhecido)</dd>' : ''}
           <dt>Importado</dt><dd>${ck.importadoEm ? esc(ck.importadoPor || '') + ' · ' + fmtDataHora(ck.importadoEm) : '—'}</dd>
           <dt>Validado</dt><dd>${v.validacao ? esc(v.validacao.pessoa) + ' · ' + fmtDataHora(v.validacao.ts) : '—'}</dd>
         </dl>
@@ -857,23 +867,111 @@ async function processarPdf(nome, buf, origem) {
       tc = await (await doc.getPage(1)).getTextContent();
       doc.destroy();
     } catch { throw new Error('O arquivo não é um PDF válido ou está corrompido.'); }
-    const ck = C.lerChecklist(C.linhasDoPdf(tc.items));
-    const ja = st.estado.codigos.get(ck.codigo);
-    if (ja) return Object.assign(r, { tipo: 'dup', placa: ck.placa, msg: `Checklist ${ck.codigo} já importado por ${ja.pessoa} em ${fmtDataHora(ja.ts)}.` });
-    const pasta = await dir(ck.placa, await dir('checklists'));
-    await escrever(pasta, `${ck.codigo}.pdf`, buf);
-    await gravar('checklist_importado', ck.placa, { ...ck, arquivo: `checklists/${ck.placa}/${ck.codigo}.pdf`, nomeOriginal: nome, ...(origem ? { origem } : {}) });
-    return Object.assign(r, { tipo: 'ok', placa: ck.placa, ck, msg: ck.resultado === 'aprovado' ? `Aprovado · vence ${fmtDataHora(ck.vencimento)} → Checklist feito – confirmar validação` : 'Reprovado → Necessário realizar checklist' });
+    let ck;
+    try { ck = C.lerChecklist(C.linhasDoPdf(tc.items)); }
+    catch (e) { // layout que o painel ainda não conhece: a pessoa confere o PDF e preenche à mão
+      st.manuais.set(++st.seqManual, { nome, buf, origem, linhas: e.linhas || [], parcial: e.parcial || {} });
+      return Object.assign(r, { tipo: 'manual', manual: st.seqManual, msg: e.message + ' Confira o PDF e preencha os dados à mão.' });
+    }
+    return await salvarChecklist(r, ck, nome, buf, origem);
   } catch (e) { return Object.assign(r, { tipo: 'err', msg: e.message }); }
 }
 
-const ROT_RES = { ok: ['validado', 'Importado'], dup: ['manutencao', 'Já importado'], err: ['necessario', 'Erro'] };
+// Confere duplicado, guarda a cópia do PDF em checklists/<placa>/ e grava o evento.
+async function salvarChecklist(r, ck, nome, buf, origem) {
+  const ja = st.estado.codigos.get(C.chaveChecklist(ck));
+  if (ja) return Object.assign(r, { tipo: 'dup', placa: ck.placa, msg: `Checklist ${ck.codigo} já importado por ${ja.pessoa} em ${fmtDataHora(ja.ts)}.` });
+  const pasta = await dir(ck.placa, await dir('checklists'));
+  await escrever(pasta, `${ck.codigo}.pdf`, buf);
+  await gravar('checklist_importado', ck.placa, { ...ck, arquivo: `checklists/${ck.placa}/${ck.codigo}.pdf`, nomeOriginal: nome, ...(origem ? { origem } : {}) });
+  return Object.assign(r, { tipo: 'ok', placa: ck.placa, ck, msg: ck.resultado === 'aprovado' ? `Aprovado · vence ${fmtDataHora(ck.vencimento)} → Checklist feito – confirmar validação` : 'Reprovado → Necessário realizar checklist' });
+}
+
+const ROT_RES = { ok: ['validado', 'Importado'], dup: ['manutencao', 'Já importado'], err: ['necessario', 'Erro'], manual: ['confirmar', 'Layout novo'] };
 function mostrarResultados(out, titulo) {
+  st.ultimosResultados = out; st.ultimoTitulo = titulo;
   const box = $('#res'); box.hidden = false;
   box.innerHTML = (titulo ? `<div class="res"><span class="sec-note" style="grid-column:1/-1">${esc(titulo)}</span></div>` : '') +
     out.map(r => `<div class="res"><span class="st ${ROT_RES[r.tipo][0]}">${ROT_RES[r.tipo][1]}</span>
-      <span>${r.placa ? `<button class="linkbtn nm" type="button" data-abrir="${esc(r.placa)}">${esc(r.placa)}</button> · ` : ''}${esc(r.msg)}</span>
+      <span>${r.placa ? `<button class="linkbtn nm" type="button" data-abrir="${esc(r.placa)}">${esc(r.placa)}</button> · ` : ''}${esc(r.msg)}${r.tipo === 'manual' && st.manuais.has(r.manual) ? ` <button class="btn ghost" type="button" data-manual-id="${r.manual}" style="margin-left:6px;padding:5px 10px">Preencher à mão</button>` : ''}</span>
       <span class="f">${esc(r.nome)}</span></div>`).join('');
+}
+
+/* ---------- preencher à mão (layout não reconhecido) ---------- */
+const PLACA_OK = /^[A-Z]{3}\d[A-Z0-9]\d{2}$/;
+const paraCampo = iso => (iso || '').slice(0, 19); // "2026-10-14T20:08:37" serve direto no datetime-local
+function abrirManual(id) {
+  const m = st.manuais.get(id); if (!m) return;
+  const p = m.parcial, d = $('#man');
+  if (m.url) URL.revokeObjectURL(m.url);
+  m.url = URL.createObjectURL(new Blob([m.buf], { type: 'application/pdf' }));
+  d.innerHTML = `<div class="det-in">
+    <div class="hero">
+      <button class="x" type="button" id="m-fechar" aria-label="Fechar">×</button>
+      <div class="cod">Layout de PDF não reconhecido</div>
+      <h3 id="man-tit" style="font-family:var(--f-ui);font-size:clamp(18px,2.6vw,24px)">Preencher à mão</h3>
+      <div class="meta"><span class="pill">${esc(m.nome)}</span></div>
+    </div>
+    <div class="man-grid">
+      <iframe src="${m.url}" title="PDF do checklist"></iframe>
+      <form class="card pad man-form" id="m-form" novalidate>
+        <p class="sec-note" style="margin:0">Confira no PDF ao lado. Os campos já vêm com o que o painel conseguiu ler. O texto do PDF fica guardado para ensinarmos esse layout ao painel depois.</p>
+        <div class="fld"><label for="m-placa" class="req">Placa do veículo</label><input class="inp num" id="m-placa" maxlength="8" autocomplete="off" value="${esc(p.placa || '')}"></div>
+        <div class="fld"><label for="m-res" class="req">Resultado</label>
+          <select class="inp" id="m-res"><option value="">Escolha…</option><option value="aprovado"${p.resultado === 'aprovado' ? ' selected' : ''}>Aprovado</option><option value="reprovado"${p.resultado === 'reprovado' ? ' selected' : ''}>Reprovado</option></select></div>
+        <div class="fld"><label for="m-teste" class="req">Data do teste</label><input class="inp num" id="m-teste" type="datetime-local" step="1" value="${esc(paraCampo(p.dataTeste))}"></div>
+        <div class="fld"><label for="m-venc" id="m-venc-l">Vencimento (expiração)</label><input class="inp num" id="m-venc" type="datetime-local" step="1" value="${esc(paraCampo(p.vencimento))}"></div>
+        <div class="fld"><label for="m-cod">Código do checklist</label><input class="inp num" id="m-cod" autocomplete="off" value="${esc(p.codigo || '')}" placeholder="Se tiver no PDF"></div>
+        <div class="fld"><label for="m-carr">Carretas</label><input class="inp num" id="m-carr" autocomplete="off" value="${esc((p.carretas || []).join(' '))}" placeholder="Ex.: FTL5079 FSN7280"></div>
+        <div class="msg err" id="m-erro" hidden style="margin:0"></div>
+        <div class="actions" style="margin-top:0">
+          <button class="btn ok" type="submit">Importar checklist</button>
+          <button class="btn ghost" type="button" id="m-cancelar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+  const marcarVenc = () => $('#m-venc-l', d).classList.toggle('req', $('#m-res', d).value === 'aprovado');
+  marcarVenc(); $('#m-res', d).onchange = marcarVenc;
+  $('#m-fechar', d).onclick = $('#m-cancelar', d).onclick = () => d.close();
+  $('#m-form', d).onsubmit = ev => { ev.preventDefault(); salvarManual(id); };
+  if (!d.open) d.showModal();
+  $(p.placa ? '#m-res' : '#m-placa', d).focus();
+}
+$('#man').addEventListener('close', () => {
+  for (const m of st.manuais.values()) if (m.url) { URL.revokeObjectURL(m.url); m.url = null; }
+  if (TOAST.parentNode !== document.body) document.body.append(TOAST);
+});
+
+async function salvarManual(id) {
+  const m = st.manuais.get(id), d = $('#man');
+  const erro = txt => { const e = $('#m-erro', d); e.textContent = txt; e.hidden = !txt; };
+  const placa = C.normalizarPlaca($('#m-placa', d).value);
+  const resultado = $('#m-res', d).value;
+  const dataTeste = $('#m-teste', d).value ? paraCampo($('#m-teste', d).value + ':00') : null;
+  const vencimento = $('#m-venc', d).value ? paraCampo($('#m-venc', d).value + ':00') : null;
+  if (!PLACA_OK.test(placa)) return erro('Placa inválida. Use o formato ABC1234 ou ABC1D23.');
+  if (!resultado) return erro('Escolha o resultado.');
+  if (!dataTeste) return erro('Preencha a data do teste.');
+  if (resultado === 'aprovado' && !vencimento) return erro('Checklist aprovado precisa do vencimento.');
+  if (vencimento && vencimento <= dataTeste) return erro('O vencimento precisa ser depois da data do teste.');
+  erro('');
+  // sem código no PDF: usa uma impressão digital do arquivo, assim o mesmo PDF não entra duas vezes
+  let codigo = $('#m-cod', d).value.trim().replace(/[\\/:*?"<>|]/g, '');
+  if (!codigo) {
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', m.buf));
+    codigo = 'M-' + [...h.slice(0, 4)].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+  }
+  const carretas = $('#m-carr', d).value.split(/[\s,;·]+/).map(C.normalizarPlaca).filter(Boolean);
+  const ck = { ...m.parcial, layout: m.parcial.layout || null, codigo, placa, resultado, dataTeste, vencimento: resultado === 'aprovado' ? vencimento : (vencimento || null), carretas,
+    lidoAMao: true, textoPdf: m.linhas.slice(0, 150).map(l => l.replace(/(Senha:\s*¦\s*)\S+/i, '$1XXXXXX')) };
+  await recarregar(); // pega importações recentes de colegas antes de checar duplicados
+  const r = await salvarChecklist({ nome: m.nome }, ck, m.nome, m.buf, m.origem);
+  if (r.tipo === 'ok') r.msg = 'Preenchido à mão · ' + r.msg;
+  if (r.tipo !== 'err') { st.manuais.delete(id); d.close(); }
+  st.ultimosResultados = (st.ultimosResultados || []).map(x => (x.manual === id ? r : x));
+  mostrarResultados(st.ultimosResultados, st.ultimoTitulo);
+  aviso(r.tipo === 'ok' ? `${placa} importado.` : r.msg, r.tipo === 'ok' ? 'ok' : r.tipo === 'dup' ? 'info' : 'err');
 }
 
 async function importar(arquivos) {
@@ -888,8 +986,9 @@ async function importar(arquivos) {
     out.push(await processarPdf(f.name, await f.arrayBuffer()));
   }
   mostrarResultados(out);
-  const ok = out.filter(r => r.tipo === 'ok').length;
-  aviso(`${ok} de ${out.length} checklist(s) importado(s).`, ok === out.length ? 'ok' : 'info');
+  const ok = out.filter(r => r.tipo === 'ok').length, man = out.filter(r => r.tipo === 'manual');
+  aviso(`${ok} de ${out.length} checklist(s) importado(s).${man.length ? ` ${man.length} com layout novo: clique em "Preencher à mão".` : ''}`, ok === out.length ? 'ok' : 'info');
+  if (man.length === 1 && out.length === 1) abrirManual(man[0].manual);
 }
 
 // Pasta entrada/: PDFs salvos ali são importados sozinhos por qualquer painel aberto.
@@ -913,7 +1012,7 @@ async function verificarEntrada() {
       const buf = await f.arrayBuffer();
       const r = await processarPdf(nome, buf, 'entrada');
       try {
-        if (r.tipo === 'err') {
+        if (r.tipo === 'err' || r.tipo === 'manual') {
           const erros = await dir('com-erro', entrada);
           let destino = nome;
           try { await erros.getFileHandle(destino); destino = `${Date.now()}_${nome}`; } catch {}
@@ -924,14 +1023,17 @@ async function verificarEntrada() {
       } catch { /* outro painel já tirou o arquivo da entrada */ }
       out.push(r);
     }
-    const ok = out.filter(r => r.tipo === 'ok').length, err = out.filter(r => r.tipo === 'err').length;
+    const ok = out.filter(r => r.tipo === 'ok').length, err = out.filter(r => r.tipo === 'err' || r.tipo === 'manual').length;
     mostrarResultados(out, `Pasta de entrada · ${fmtDataHora(new Date().toISOString())}`);
     if (ok || err) aviso(`${ok} checklist(s) importado(s) da pasta de entrada${err ? ` · ${err} com erro, em entrada/com-erro/` : ''}.`, err ? 'info' : 'ok');
   } catch (e) {
     aviso('Não foi possível ler a pasta de entrada: ' + e.message, 'err');
   } finally { st.verificandoEntrada = false; }
 }
-$('#res').addEventListener('click', e => { const b = e.target.closest('[data-abrir]'); if (b) abrir(b.dataset.abrir); });
+$('#res').addEventListener('click', e => {
+  const b = e.target.closest('[data-abrir]'); if (b) abrir(b.dataset.abrir);
+  const m = e.target.closest('[data-manual-id]'); if (m) abrirManual(Number(m.dataset.manualId));
+});
 $('#arq').addEventListener('change', e => { importar([...e.target.files]); e.target.value = ''; });
 const drop = $('#drop');
 ['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { if (!st.pessoa || !e.dataTransfer?.types?.includes('Files')) return; e.preventDefault(); drop.classList.add('over'); }));
@@ -982,7 +1084,7 @@ function botao(txt, cls, fn) { const b = document.createElement('button'); b.typ
 let toastT;
 function aviso(txt, tipo) {
   const t = TOAST; t.className = 'msg ' + (tipo || 'info'); t.textContent = txt; t.hidden = false;
-  const det = $('#det'), alvo = det.open ? det : document.body; // o detalhe fica acima de tudo; a mensagem vai junto
+  const aberto = [$('#man'), $('#det')].find(x => x.open), alvo = aberto || document.body; // a janela aberta fica acima de tudo; a mensagem vai junto
   if (t.parentNode !== alvo) alvo.append(t);
   clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, tipo === 'err' ? 9000 : 4000);
 }
